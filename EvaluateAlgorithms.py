@@ -13,7 +13,7 @@ import wave
 import csv
 import matplotlib.pyplot as plt
 
-CHUNK_SIZE = 4096
+CHUNK_SIZE = 8192
 
 def ReadAudioFile(path):
     audioFile = wave.openfp(path, 'rb')
@@ -208,9 +208,9 @@ def compareYinPRAAT(YinPitch, PRAATPitch, robust = True):
     ax.set_title('Fundamental Frequency')
     plt.show()
 
-FormantCSVPath = 'R:\SteppLab\Members\Josh_Levitt\TestData\FormantCSV.csv'
-WavPath = 'R:\SteppLab\Members\Josh_Levitt\TestData\LSP01_intelligibility.wav'
-PitchCSVPath = 'R:\SteppLab\Members\Josh_Levitt\TestData\PitchCSV.txt'
+FormantCSVPath = 'R:\SteppLab\Members\Josh_Levitt\TestData_LabOnly\FormantCSV.csv'
+WavPath = 'R:\SteppLab\Members\Josh_Levitt\TestData_LabOnly\LSP01_intelligibility.wav'
+PitchCSVPath = 'R:\SteppLab\Members\Josh_Levitt\TestData_LabOnly\PitchCSV.txt'
 fs, AudioData = ReadAudioFile(WavPath)
 '''
 PraatFormantData = ReadFormantCSV(FormantCSVPath)
