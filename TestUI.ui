@@ -81,7 +81,7 @@
      <rect>
       <x>540</x>
       <y>10</y>
-      <width>81</width>
+      <width>141</width>
       <height>421</height>
      </rect>
     </property>
@@ -135,6 +135,16 @@
      <string>Save Pitch</string>
     </property>
    </widget>
+   <widget class="MatplotlibWidget" name="VocalTractPlot">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>10</y>
+      <width>141</width>
+      <height>421</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -142,7 +152,7 @@
      <x>0</x>
      <y>0</y>
      <width>1084</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

@@ -72,6 +72,23 @@ def findFormantsLPC(Frame, fs):
         
     return Formants
     
+def getVocalTractLength(Formants, c, method = 'fd'):  
+    if method == 'fd':
+        if len(Formants) == 1:
+            L = c / (4 *  Formants[0])
+        elif len(Formants) > 1:
+            m = len(Formants)
+            theta = Formants[0] / (2 * m - 1) + Formants[-1] / (2 * m - 1)
+            L = c / (4 * theta)
+        else:
+            L = np.nan
+    else:
+        print('Invalid Vocal Tract Estimator technique')
+        return False
+    
+    return L
+    
+    
 '''    
 x = np.linspace(0, 44100/2, 100)
 print(Gaussian3(x, 300, 300, 150, 100, 800, 150, 80, 1500, 80))
