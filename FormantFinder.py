@@ -63,7 +63,7 @@ def findFormantsLPC(Frame, fs):
     Formants = np.zeros(len(freqs))
     nFormants = 0
     for i in range(len(freqs)):
-        if freqs[i] > 90 and freqs[i] < 5000 and bandWidth[i] < 400:
+        if freqs[i] > 90 and freqs[i] < 5000 and bandWidth[i] < 500:
             Formants[nFormants] = freqs[i]
             nFormants += 1
             
@@ -72,16 +72,30 @@ def findFormantsLPC(Frame, fs):
         
     return Formants
     
-def getVocalTractLength(Formants, c, method = 'fd'):  
-    if method == 'fd':
-        if len(Formants) == 1:
-            L = c / (4 *  Formants[0])
-        elif len(Formants) > 1:
-            m = len(Formants)
-            theta = Formants[0] / (2 * m - 1) + Formants[-1] / (2 * m - 1)
+def getVocalTractLength(Formants, c = 34300, method = 'fd'):
+    F = Formants
+    lastNonZero = 0
+    for i in range(len(F)):
+        if F[i] != 0:
+            lastNonZero = i
+            
+    F = F[0:lastNonZero + 1]
+    if method == 'fd': #Frequency Dispersion method
+        if len(F) == 1:
+            L = c / (4 *  F[0])
+        elif len(F) > 1:
+            m = len(F)
+            theta = -1 * F[0] / (2 * m - 1) + F[-1] / (2 * m - 1)
             L = c / (4 * theta)
         else:
             L = np.nan
+            
+    elif method == 'lammert': #Lammert Method
+        beta = [0.3, 0.082, 0.124, 0.354]
+        theta = 229
+        for i in range(np.min([4, len(F)])):
+            theta += F[i] * beta[i] / (2 * i - 1)
+        L = c / (4 * theta)
     else:
         print('Invalid Vocal Tract Estimator technique')
         return False

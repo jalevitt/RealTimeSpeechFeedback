@@ -250,6 +250,7 @@ class Ui_MainWindow(object):
         
         c = 34300 # speed of sound in cm/s
         maxPitchLag = 3
+        maxVocalLag = 3
         ds_rate = 3
         #set up time vector
         print('Beginning New Recording')
@@ -299,14 +300,21 @@ class Ui_MainWindow(object):
                         self.Pitch = np.concatenate((self.Pitch, np.zeros(200, dtype = np.float32)))
                         self.PitchTime = np.concatenate((self.PitchTime, np.zeros(200, dtype = np.float32)))
                         
-
+                    #get pitches from the last 3 seconds
                     RecentPitches = []
                     pitchIDX = PitchCount - 1
                     while self.PitchTime[pitchIDX] >= 1.0 * (t - chunkSize / 2) / self.fs - maxPitchLag and pitchIDX >= 0:
                         RecentPitches.append(self.Pitch[pitchIDX])
                         pitchIDX -= 1
+                        
+                    #get mean and std
                     meanPitch = np.mean(RecentPitches)
-                    stdPitch = np.std(RecentPitches)
+                    if len(RecentPitches) == 1:
+                        stdPitch = 25
+                    else:
+                        stdPitch = np.std(RecentPitches)
+                    
+                    #plot
                     f0ax.bar([0], [2.0 * stdPitch], bottom = [meanPitch - stdPitch])
                     f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     f0ax.set_ylim((0, 500))
@@ -356,9 +364,23 @@ class Ui_MainWindow(object):
                         if FormantCount >= len(self.FormantTime):
                             self.Formants = np.concatenate((self.Formants, np.zeros((200, 5), dtype = np.float32)))
                             self.FormantTime = np.concatenate((self.FormantTime, np.zeros(200, dtype = np.float32)))
+                        
+                        #detect recent vocal tract lengths
+                        RecentTractLength = []
+                        tractIDX = FormantCount - 1
+                        while self.FormantTime[tractIDX] >= 1.0 * (t - chunkSize / 2) / self.fs - maxVocalLag and tractIDX >= 0:
+                            RecentTractLength.append(FormantFinder.getVocalTractLength(self.Formants[tractIDX, :], c, method = 'lammert'))
+                            tractIDX -= 1
                             
-                        TractLength = FormantFinder.getVocalTractLength(Formants, c)
-                        tractAx.bar([0], [TractLength])
+                        # get mean, std    
+                        meanTractLength = np.median(RecentTractLength)
+                        if len(RecentTractLength) == 1:
+                            stdTractLength = 2
+                        else:
+                            stdTractLength = np.std(RecentTractLength)
+                        
+                        # plot bar
+                        tractAx.bar([0], [2 * stdTractLength], bottom = [meanTractLength - stdTractLength])
                         tractAx.set_ylabel('Vocal Tract Length (cm)')
                         tractAx.set_ylim((0, 25))
                         tractAx.set_xlim((0, 0.8))
@@ -373,7 +395,7 @@ class Ui_MainWindow(object):
                     PSD = np.zeros(10)
                     
                 #update our raw data plot, but only everyother chunk, because its time consuming
-                if t > windowSize * self.fs and i % 2 == 0:
+                if t > windowSize * self.fs and i % 3 == 0:
                     ax.plot(time[t - windowSize * self.fs:t], 
                             self.Recording[t - windowSize * self.fs:t])
                     ax.set_title('Raw Waveform')
@@ -458,7 +480,7 @@ class Ui_MainWindow(object):
         
     def Playback(self): # similar to Go, but uses data from Load instead of collecting new data
         self.Status = True        
-        chunkSize = 4096
+        chunkSize = 8192
         windowSize = 3
         p = pyaudio.PyAudio()
         audioStream = p.open(format = pyaudio.paInt16, channels = 1, rate = self.fs, 
@@ -497,6 +519,8 @@ class Ui_MainWindow(object):
         
         formantAx = self.FormantPlot.figure.add_subplot(111)
         maxPitchLag = 3
+        maxVocalLag = 3
+        
         ds_rate = 3
         
         c = 34300 # speed of sound in cm/s
@@ -512,10 +536,6 @@ class Ui_MainWindow(object):
                 data = PyAudioTest.getChunk(chunkSize, audioStream, Random = 0)
                 data = self.Recording[t - chunkSize:t]
                 data_ds = data[0:chunkSize:ds_rate] 
-                # use my hack method for getting f0
-                #clipData = PyAudioTest.centerClip(data)
-                #acf = PyAudioTest.autocorr(clipData)
-                #f0 = PyAudioTest.getF0(acf, self.fs) 
                 
                 # use yin implementation
                 data_hamming = data * np.hamming(chunkSize)
@@ -538,8 +558,12 @@ class Ui_MainWindow(object):
                     while self.PitchTime[pitchIDX] >= 1.0 * (t - chunkSize / 2) / self.fs - maxPitchLag and pitchIDX >= 0:
                         RecentPitches.append(self.Pitch[pitchIDX])
                         pitchIDX -= 1
+                        
                     meanPitch = np.mean(RecentPitches)
-                    stdPitch = np.std(RecentPitches)
+                    if len(RecentPitches) == 1:
+                        stdPitch = 25
+                    else:
+                        stdPitch = np.std(RecentPitches)
                     f0ax.bar([0], [2.0 * stdPitch], bottom = [meanPitch - stdPitch])
                     f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     f0ax.set_ylim((0, 500))
@@ -592,8 +616,20 @@ class Ui_MainWindow(object):
                             self.Formants = np.concatenate((self.Formants, np.zeros((200, 5), dtype = np.float32)))
                             self.FormantTime = np.concatenate((self.FormantTime, np.zeros(200, dtype = np.float32)))
                             
-                        TractLength = FormantFinder.getVocalTractLength(Formants, c)
-                        tractAx.bar([0], [TractLength])
+                        RecentTractLength = []
+                        tractIDX = FormantCount - 1
+                        while self.FormantTime[tractIDX] >= 1.0 * (t - chunkSize / 2) / self.fs - maxVocalLag and tractIDX >= 0:
+                            RecentTractLength.append(FormantFinder.getVocalTractLength(self.Formants[tractIDX, :], c, method = 'lammert'))
+                            tractIDX -= 1
+                            
+                        meanTractLength = np.median(RecentTractLength)
+                        if len(RecentTractLength) == 1:
+                            stdTractLength = 2
+                        else:
+                            stdTractLength = np.std(RecentTractLength)
+                        #TractLength = FormantFinder.getVocalTractLength(Formants, c)
+                        tractAx.bar([0], [2 * stdTractLength], bottom = [meanTractLength - stdTractLength])
+                        #tractAx.bar([0], [TractLength])
                         tractAx.set_ylabel('Vocal Tract Length (cm)')
                         tractAx.set_ylim((0, 25))
                         tractAx.set_xlim((0, 0.8))
@@ -608,7 +644,7 @@ class Ui_MainWindow(object):
                     PSD = np.zeros(10)
                 
                 Count += 1    
-                if t > windowSize * self.fs and Count % 4 == 0:               
+                if t > windowSize * self.fs and Count % 3 == 0:               
                     ax.plot(time[t - windowSize * self.fs:t], 
                             self.Recording[t - windowSize * self.fs:t])
                     plt.xlim(t/self.fs - windowSize, t/self.fs + 1)
