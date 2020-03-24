@@ -165,40 +165,43 @@ class Ui_MainWindow(object):
         self.myCallback.setText(_translate("MainWindow", "Test", None))
         
     def StopRun(self):
+        #stop recording/playback
         self.Status = False
         
-    def SaveF(self):
+    def SaveF(self): 
+        # save formants
         root = Tk()
-        path = tkFileDialog.asksaveasfilename()
+        path = tkFileDialog.asksaveasfilename() #choose file name
         if not path:
             print('Invalid filename')
             root.destroy()
             return False
-            
+        #write to csv    
         with open(path, 'w') as csvfile:
             FormantWriter = csv.writer(csvfile, delimiter = ',', lineterminator ='\n')
             FormantWriter.writerow(['time(s)', 'f1 (Hz)', 'f2 (Hz)', 'f3 (Hz)', 'f4 (Hz)', 'f5 (Hz)'])
             for i in range(len(self.FormantTime)):
                 FormantWriter.writerow(np.concatenate((self.FormantTime[i], self.Formants[i, :]), axis = None))
-            
+        #close stuff    
         print('Formant CSV save successful')
         root.destroy()
         return True
         
     def SaveP(self):
+        #save Pitch
         root = Tk()
-        path = tkFileDialog.asksaveasfilename()
+        path = tkFileDialog.asksaveasfilename() #choose file to save to
         if not path:
             print('Invalid filename')
             root.destroy()
             return False
-            
+        #write to csv    
         with open(path, 'w') as csvfile:
             PitchWriter = csv.writer(csvfile, delimiter = ',', lineterminator ='\n')
             PitchWriter.writerow(['time(s)', 'Pitch (Hz)'])
             for i in range(len(self.PitchTime)):
                 PitchWriter.writerow(np.concatenate((self.PitchTime[i], self.Pitch[i]), axis = None))
-            
+        #close stuff      
         print('Pitch CSV save successful')
         root.destroy()
         return True
@@ -674,7 +677,6 @@ class Ui_MainWindow(object):
         self.PitchTime = self.PitchTime[0:PitchCount]
         self.Formants = self.Formants[0:FormantCount, :]
         self.FormantTime = self.FormantTime[0:FormantCount]        
-        print('Recording Completed')
         print('Recording Completed')
         print('recorded time is')
         print(1.0 * t / self.fs)

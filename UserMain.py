@@ -14,6 +14,7 @@ import numpy as np
 from Tkinter import *
 import Tkinter, Tkconstants, tkFileDialog
 from matplotlibwidget import MatplotlibWidget
+
 import matplotlib.pyplot as plt
 import wave
 import time as ti
@@ -31,6 +32,8 @@ class Main(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent)
         self.ui = UserUI.Ui_MainWindow()
         self.ui.setupUi(self)
+        
+        
         # set up button callbacks  
         
         self.ui.Go.clicked.connect(self._GoRun)

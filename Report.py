@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 23 10:06:10 2020
-
-@author: Josh Levitt
-"""
 
 # Form implementation generated from reading ui file 'Documents\RealTimeSpeechFeedback-working\Report.ui'
 #
-# Created: Mon Mar 23 10:06:03 2020
+# Created: Tue Mar 24 16:54:46 2020
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(760, 743)
+        MainWindow.resize(760, 784)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.RawPlot = MatplotlibWidget(self.centralwidget)
@@ -46,12 +41,9 @@ class Ui_MainWindow(object):
         self.VarPlot = MatplotlibWidget(self.centralwidget)
         self.VarPlot.setGeometry(QtCore.QRect(10, 570, 531, 161))
         self.VarPlot.setObjectName(_fromUtf8("VarPlot"))
-        self.pushButton = QtGui.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(550, 60, 93, 28))
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.pushButton_2 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(550, 90, 93, 28))
-        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+        self.PlayBack = QtGui.QPushButton(self.centralwidget)
+        self.PlayBack.setGeometry(QtCore.QRect(550, 60, 93, 28))
+        self.PlayBack.setObjectName(_fromUtf8("PlayBack"))
         #MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 760, 26))
@@ -66,8 +58,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.pushButton.setText(_translate("MainWindow", "PushButton", None))
-        self.pushButton_2.setText(_translate("MainWindow", "PushButton", None))
+        self.PlayBack.setText(_translate("MainWindow", "Play Selection", None))
 
 from matplotlibwidget import MatplotlibWidget
 

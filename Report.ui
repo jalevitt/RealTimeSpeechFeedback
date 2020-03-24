@@ -54,7 +54,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="PlayBack">
     <property name="geometry">
      <rect>
       <x>550</x>
@@ -64,20 +64,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>90</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
+     <string>Play Selection</string>
     </property>
    </widget>
   </widget>
