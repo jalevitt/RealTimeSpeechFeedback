@@ -19,8 +19,54 @@ and eventrelease are the same.
 from matplotlib.widgets import RectangleSelector
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import patches
 
 
+# adapted from https://stackoverflow.com/questions/34517484/persistent-rectangle-selector
+class PersistRectangleSelector(RectangleSelector):
+    #Taken from matplotlib source code
+    def release(self, event):
+        """on button release event"""
+        if self.eventpress is None or self.ignore(event):
+            return
+        # make the box/line invisible again
+        self.to_draw.set_visible(True)
+        self.canvas.draw()
+        # release coordinates, button, ...
+        self.eventrelease = event
+
+        if self.spancoords == 'data':
+            xmin, ymin = self.eventpress.xdata, self.eventpress.ydata
+            xmax, ymax = self.eventrelease.xdata, self.eventrelease.ydata
+            # calculate dimensions of box or line get values in the right
+            # order
+        elif self.spancoords == 'pixels':
+            xmin, ymin = self.eventpress.x, self.eventpress.y
+            xmax, ymax = self.eventrelease.x, self.eventrelease.y
+        else:
+            raise ValueError('spancoords must be "data" or "pixels"')
+
+        if xmin > xmax:
+            xmin, xmax = xmax, xmin
+        if ymin > ymax:
+            ymin, ymax = ymax, ymin
+
+        spanx = xmax - xmin
+        spany = ymax - ymin
+        xproblems = self.minspanx is not None and spanx < self.minspanx
+        yproblems = self.minspany is not None and spany < self.minspany
+
+        if (((self.drawtype == 'box') or (self.drawtype == 'line')) and
+                (xproblems or yproblems)):
+            # check if drawn distance (if it exists) is not too small in
+            # neither x nor y-direction
+            return
+
+        self.onselect(self.eventpress, self.eventrelease)
+                                              # call desired function
+        self.eventpress = None                # reset the variables to their
+        self.eventrelease = None              # inital values
+        return False
 
 
 def line_select_callback(eclick, erelease, parent = None):
