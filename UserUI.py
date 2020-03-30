@@ -90,7 +90,7 @@ class Ui_MainWindow(object):
         self.VarTarget = QtGui.QDoubleSpinBox(self.centralwidget)
         self.VarTarget.setGeometry(QtCore.QRect(880, 470, 62, 22))
         self.VarTarget.setMaximum(100.0)
-        self.VarTarget.setProperty("value", 15.0)
+        self.VarTarget.setProperty("value", 5.0)
         self.VarTarget.setObjectName(_fromUtf8("VarTarget"))
         self.label = QtGui.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(560, 450, 101, 16))

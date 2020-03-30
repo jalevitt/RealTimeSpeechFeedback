@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Documents\RealTimeSpeechFeedback-working\Report.ui'
 #
-# Created: Tue Mar 24 16:54:46 2020
+# Created: Mon Mar 30 16:16:39 2020
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(760, 784)
+        MainWindow.resize(830, 784)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.RawPlot = MatplotlibWidget(self.centralwidget)
@@ -44,9 +44,21 @@ class Ui_MainWindow(object):
         self.PlayBack = QtGui.QPushButton(self.centralwidget)
         self.PlayBack.setGeometry(QtCore.QRect(550, 60, 93, 28))
         self.PlayBack.setObjectName(_fromUtf8("PlayBack"))
+        self.RecordingText = QtGui.QTextBrowser(self.centralwidget)
+        self.RecordingText.setGeometry(QtCore.QRect(550, 130, 256, 231))
+        self.RecordingText.setObjectName(_fromUtf8("RecordingText"))
+        self.SelectionText = QtGui.QTextBrowser(self.centralwidget)
+        self.SelectionText.setGeometry(QtCore.QRect(550, 410, 256, 231))
+        self.SelectionText.setObjectName(_fromUtf8("SelectionText"))
+        self.label = QtGui.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(560, 390, 131, 16))
+        self.label.setObjectName(_fromUtf8("label"))
+        self.label_2 = QtGui.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(560, 110, 141, 16))
+        self.label_2.setObjectName(_fromUtf8("label_2"))
         #MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 760, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 830, 26))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         #MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -59,6 +71,13 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.PlayBack.setText(_translate("MainWindow", "Play Selection", None))
+        self.RecordingText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p></body></html>", None))
+        self.label.setText(_translate("MainWindow", "Selection Statistics", None))
+        self.label_2.setText(_translate("MainWindow", "Recording Statistics", None))
 
 from matplotlibwidget import MatplotlibWidget
 

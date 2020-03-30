@@ -69,9 +69,7 @@ class ReportWindow(QtGui.QDialog):
         self.f0ax = self.ui.PitchPlot.figure.add_subplot(111)
         self.f0ax.set_position([0.12, 0.25, 0.85, 0.63])
         self.f0ax.hold(True)
-        self.f0ax.plot((0, 1.0 * n/parent.ui.fs), 
-                (parent.ui.PitchTarget.value(), parent.ui.PitchTarget.value()), 
-                 color = 'black')
+        self.f0ax.plot(parent.ui.Time, parent.ui.Targets[:, 0], color = 'black')
         self.f0ax.scatter(parent.ui.PitchTime, Pitch)
         self.f0ax.set_ylim((0, 500))
         self.f0ax.set_xlim((0, 1.0 * n/parent.ui.fs))
@@ -99,9 +97,7 @@ class ReportWindow(QtGui.QDialog):
         self.VTLax = self.ui.VTLPlot.figure.add_subplot(111)
         self.VTLax.set_position([0.12, 0.25, 0.85, 0.63])
         self.VTLax.hold(True)
-        self.VTLax.plot((0, 1.0 * n/parent.ui.fs), 
-                   (parent.ui.VTLTarget.value(), parent.ui.VTLTarget.value()), 
-                    color = 'black')
+        self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1], color = 'black')
         self.VTLax.scatter(parent.ui.FormantTime, VTL)
         self.VTLax.set_ylim((0, 25))
         self.VTLax.set_xlim((0, 1.0 * n/parent.ui.fs))
@@ -119,23 +115,38 @@ class ReportWindow(QtGui.QDialog):
                 RecentVar.append(parent.ui.Pitch[i-idx])
                 idx += 1
             if len(RecentVar) > 1:
-                Var[i] = np.std(RecentVar)
+                m = np.mean(RecentVar)               
+                Var[i] = np.std(39.86 * np.log10(np.array(RecentVar)/m))
             else:
                 Var[i] = np.nan
         
         self.VarAx = self.ui.VarPlot.figure.add_subplot(111)
         self.VarAx.set_position([0.12, 0.25, 0.85, 0.63])
         self.VarAx.hold(True)
-        self.VarAx.plot((0, 1.0 * n/parent.ui.fs), 
-                   (parent.ui.VarTarget.value(), parent.ui.VarTarget.value()), 
-                    color = 'black')
+        self.VarAx.plot(parent.ui.Time, parent.ui.Targets[:, 2], color = 'black')
         self.VarAx.scatter(parent.ui.PitchTime, Var)
-        self.VarAx.set_ylim((0, 40))
+        self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 1.0 * n/parent.ui.fs))
         self.VarAx.set_title('Pitch Variability')
         self.VarAx.set_ylabel('Pitch Variability (Hz)')
         self.VarAx.set_xlabel('Time (s)')
         self.ui.VarPlot.show()
+        
+        D = 1.0 * n/parent.ui.fs
+        MP = np.nanmean(Pitch)
+        MVTL = np.nanmean(VTL)
+        MPV = np.nanmean(Var)
+        RecordingStats = """
+ Duration:                   %05.1f seconds
+ Mean Pitch:                 %05.1f Hz
+ Mean Vocal Tract Length:    %05.2f cm
+ Mean Pitch Variability:     %05.2f st        
+        """ %(D, MP, MVTL, MPV)
+        self.ui.RecordingText.setText(RecordingStats)
+        
+        self.Var = Var
+        self.Pitch = Pitch
+        self.VTL = VTL
         
         self.ui.PlayBack.clicked.connect(self._PlayCallback)
         

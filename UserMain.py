@@ -53,6 +53,8 @@ class Main(QtGui.QMainWindow):
         self.ui.FormantTime = np.zeros(100, dtype = np.float32)
         self.ui.Pitch = np.zeros(100, dtype = np.float32)
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
+        self.ui.Time = np.zeros(1000, dtype = np.float32)
+        self.ui.Targets = np.zeros((1000, 3), dtype = np.float32)
         
         # set up axes labels etc        
         ax = self.ui.TwoD.figure.add_subplot(111)
@@ -91,7 +93,7 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        VarAx.set_ylabel('Pitch Variability (Hz)')
+        VarAx.set_ylabel('Pitch Variability (Semitones)')
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
@@ -149,7 +151,7 @@ class Main(QtGui.QMainWindow):
         self.ui.fs = 44100 #set sample rate, default to 44100
         iters = 1000 # (mostly) deprecated
         chunkSize = 8192 #number of samples to read in at once
-        numSamples = iters * chunkSize
+        numSamples = iters * chunkSize # sets an initial size for our recording buffer
         
         #set up an audio stream
         p = pyaudio.PyAudio()
@@ -194,17 +196,20 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        VarAx.set_ylabel('Pitch Variability (Hz)')
+        VarAx.set_ylabel('Pitch Variability (Semitones)')
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
         c = 34300 # speed of sound in cm/s
-        maxPitchLag = 3
-        maxVocalLag = 3
-        maxPitchVarLag = 10
+        maxPitchLag = 3 #winodw size for calculating pitch in sec
+        maxVocalLag = 3 #winodw size for calculating VTL in sec
+        maxPitchVarLag = 10 #window size for calculating pitch var in sec
+        
+        #initialize vars
         meanPitch = 0
         meanTractLength = 0
         stdPitch = 0
+        STVarPitch = 0
         
         ds_rate = 3
         #set up time vector
@@ -274,15 +279,28 @@ class Main(QtGui.QMainWindow):
                         
                     if len(RecentPitches) > 1:
                         stdPitch = np.std(RecentPitches)
+                        meanPitch = np.mean(RecentPitches)
                     else:
                         stdPitch = 0
-                    h = 0.5
+                    
+                    #convert to semitones
+                    RPitch = np.array(RecentPitches)
+                    RPitch = 39.86 * np.log10(RPitch / meanPitch)
+                    
+                    if len(RPitch) > 1:
+                        STVarPitch = np.std(RPitch)
+                        
+                    else:
+                        STVarPitch = 0
+                    
+                    # make pitch variability bar graph
+                    h = 0.1
                     VarAx.clear()
                     VarAx.hold(True)
-                    VarAx.bar([0], [2.0 * h], bottom = [stdPitch - h])
+                    VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
                     VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                    VarAx.set_ylabel('Pitch Variability (Hz)')
-                    VarAx.set_ylim((0, 100))
+                    VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    VarAx.set_ylim((0, 25))
                     VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
                     
@@ -328,11 +346,12 @@ class Main(QtGui.QMainWindow):
                     except (RuntimeError): #formant detection can throw errors sometimes
                         Formants = np.zeros(3)
                 
-                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - stdPitch)/self.ui.VarTarget.value()
+                #choose color based on how close we are to the variablility target
+                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - STVarPitch)/self.ui.VarTarget.value()
                 if DiffVar > 1:
                     DiffVar = 1
-                    
                 C = (DiffVar, 1 - DiffVar, 0)
+                #make scatter plot
                 ax.clear()
                 ax.hold(True)
                 ax.scatter([meanPitch], [meanTractLength], color = C)
@@ -343,19 +362,32 @@ class Main(QtGui.QMainWindow):
                 ax.set_xlim((0, 500))
                 ax.set_ylim((9, 25))
                 self.ui.TwoD.draw()
-
+                
+                #keep track of our target values, in case they chane over time
+                if i >= len(self.ui.Time): # add extra space to vectors in case we need it
+                    self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
+                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 3), dtype = np.float32)))
+                    
+                self.ui.Time[i] = 1.0 * t / self.ui.fs
+                self.ui.Targets[i, 0] = self.ui.PitchTarget.value() 
+                self.ui.Targets[i, 1] = self.ui.VTLTarget.value()
+                self.ui.Targets[i, 2] =self.ui.VarTarget.value()
                 i += 1
                 
                 #check for incoming button clicks i.e. stop button
                 QtCore.QCoreApplication.processEvents()
 
         except (KeyboardInterrupt, SystemExit): # in case of a keyboard interrupt or system exit, clean house
+            
             self.ui.TwoD.draw()
             self.ui.FundamentalFrequenncyPlot.draw()
+            #truncate zero pads
             self.ui.Pitch = self.ui.Pitch[0:PitchCount]
             self.ui.PitchTime = self.ui.PitchTime[0:PitchCount]
             self.ui.Formants = self.ui.Formants[0:FormantCount, :]
             self.ui.FormantTime = self.ui.FormantTime[0:FormantCount]
+            self.ui.Time = self.ui.Time[0:i]
+            self.ui.Targets = self.ui.Targets[0:i, :]
             print('Recording Completed')
             self.ui.Recording = self.ui.Recording[0:t]
             print('recorded time is')
@@ -363,11 +395,13 @@ class Main(QtGui.QMainWindow):
             print('elapsed time is:')
             print(ti.time() - start)
             return True            
-            
+        #truncate zero pads
         self.ui.Pitch = self.ui.Pitch[0:PitchCount]
         self.ui.PitchTime = self.ui.PitchTime[0:PitchCount]
         self.ui.Formants = self.ui.Formants[0:FormantCount, :]
-        self.ui.FormantTime = self.ui.FormantTime[0:FormantCount]    
+        self.ui.FormantTime = self.ui.FormantTime[0:FormantCount]
+        self.ui.Time = self.ui.Time[0:i]
+        self.ui.Targets = self.ui.Targets[0:i, :]
         print('Recording Completed')
         self.ui.Recording = self.ui.Recording[0:t]
         print('recorded time is')
@@ -413,8 +447,7 @@ class Main(QtGui.QMainWindow):
         self.ui.fs = audioFile.getframerate() #get fs
         n = audioFile.getnframes() # get length
         data = np.frombuffer(audioFile.readframes(n), dtype = np.int16) 
-        self.ui.Recording = data # instert audio into our recording
-        print(self.ui.Recording)
+        self.ui.Recording = data # insert audio into our recording
         print("Recording Loaded successfully")
         root.destroy()
         return True
@@ -474,6 +507,8 @@ class Main(QtGui.QMainWindow):
         meanPitch = 0
         meanTractLength = 0
         stdPitch = 0
+        STVarPitch = 0
+        
         
         ds_rate = 3
         
@@ -532,15 +567,27 @@ class Main(QtGui.QMainWindow):
                         
                     if len(RecentPitches) > 1:
                         stdPitch = np.std(RecentPitches)
+                        meanPitch = np.mean(RecentPitches)
                     else:
                         stdPitch = 0
-                    h = 0.5
+                    
+                    #convert to semitones
+                    RPitch = np.array(RecentPitches)
+                    RPitch = 39.86 * np.log10(RPitch / meanPitch)
+                    
+                    if len(RPitch) > 1:
+                        STVarPitch = np.std(RPitch)
+                        
+                    else:
+                        STVarPitch = 0
+                        
+                    h = 0.1
                     VarAx.clear()
                     VarAx.hold(True)
-                    VarAx.bar([0], [2.0 * h], bottom = [stdPitch - h])
+                    VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
                     VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                    VarAx.set_ylabel('Pitch Variability (Hz)')
-                    VarAx.set_ylim((0, 100))
+                    VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    VarAx.set_ylim((0, 25))
                     VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
                     
@@ -585,7 +632,7 @@ class Main(QtGui.QMainWindow):
                     except (RuntimeError):
                         Formants = np.zeros(3)
                         
-                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - stdPitch)/self.ui.VarTarget.value()
+                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - STVarPitch)/self.ui.VarTarget.value()
                 if DiffVar > 1:
                     DiffVar = 1
                     
@@ -601,6 +648,15 @@ class Main(QtGui.QMainWindow):
                 ax.set_ylim((9, 25))
                 self.ui.TwoD.draw()
                 
+                if Count >= len(self.ui.Time):
+                    self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
+                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 3), dtype = np.float32)))
+                    
+                self.ui.Time[Count] = 1.0 * t / self.ui.fs
+                self.ui.Targets[Count, 0] = self.ui.PitchTarget.value() 
+                self.ui.Targets[Count, 1] = self.ui.VTLTarget.value()
+                self.ui.Targets[Count, 2] =self.ui.VarTarget.value()
+                
                 Count += 1    
                     
                 QtCore.QCoreApplication.processEvents()
@@ -610,6 +666,8 @@ class Main(QtGui.QMainWindow):
             self.ui.FundamentalFrequenncyPlot.draw()
             self.ui.Pitch = self.ui.Pitch[0:PitchCount]
             self.ui.PitchTime = self.ui.PitchTime[0:PitchCount]
+            self.ui.Time = self.ui.Time[0:Count]
+            self.ui.Targets = self.ui.Targets[0:Count, :]
             self.ui.Formants = self.ui.Formants[0:FormantCount, :]
             self.ui.FormantTime = self.ui.FormantTime[0:FormantCount]
             print('Recording Completed')
@@ -621,6 +679,8 @@ class Main(QtGui.QMainWindow):
             
         self.ui.Pitch = self.ui.Pitch[0:PitchCount]
         self.ui.PitchTime = self.ui.PitchTime[0:PitchCount]
+        self.ui.Time = self.ui.Time[0:Count]
+        self.ui.Targets = self.ui.Targets[0:Count, :]
         self.ui.Formants = self.ui.Formants[0:FormantCount, :]
         self.ui.FormantTime = self.ui.FormantTime[0:FormantCount]        
         print('Recording Completed')
