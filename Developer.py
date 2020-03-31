@@ -7,7 +7,6 @@ Created on Mon Mar 23 10:41:12 2020
 
 import sys
 from PyQt4 import QtCore, QtGui
-import UserUI 
 import PyAudioTest
 import pyaudio
 import numpy as np
@@ -24,14 +23,15 @@ import FormantFinder # formant algorithm found online, see FormantFinder.py for 
 import csv
 import warnings
 import ReportMain
-import Developer
+import DeveloperUI
+import UserMain
 
 warnings.filterwarnings("ignore")
 
 class Main(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
-        self.ui = UserUI.Ui_MainWindow()
+        self.ui = DeveloperUI.Ui_MainWindow()
         self.ui.setupUi(self)
         
         
@@ -45,7 +45,7 @@ class Main(QtGui.QMainWindow):
         self.ui.SaveFormants.clicked.connect(self._SaveF)
         self.ui.SavePitch.clicked.connect(self._SaveP)
         self.ui.ReportButton.clicked.connect(self._MakeReport)
-        self.ui.DevMode.clicked.connect(self._LaunchDevMode)
+        self.ui.UserMode.clicked.connect(self._LaunchUserMode)
         
         # set up some vriables
         self.ui.Recording = np.zeros(100000, dtype = np.int16)
@@ -59,10 +59,14 @@ class Main(QtGui.QMainWindow):
         self.ui.Targets = np.zeros((1000, 3), dtype = np.float32)
         
         # set up axes labels etc        
-        ax = self.ui.TwoD.figure.add_subplot(111)
-        ax.set_title('Speech Targeting')
-        ax.set_xlabel('Pitch (Hz)')
-        ax.set_ylabel('Vocal Tract Length (cm)')
+        ax = self.ui.RawPlot.figure.add_subplot(111)
+        ax.set_title('Raw Waveform')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Amplitude')
+        PSDax = self.ui.PSDPlot.figure.add_subplot(111)
+        PSDax.set_title('Power Spectrum')
+        PSDax.set_xlabel('Frequency (Hz)')
+        PSDax.set_ylabel('Power')
         f0ax = self.ui.FundamentalFrequenncyPlot.figure.add_subplot(111)
         f0ax.tick_params(
                         axis = 'x',
@@ -99,8 +103,8 @@ class Main(QtGui.QMainWindow):
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
-    def _LaunchDevMode(self):
-        Developer.Main(parent = self).show()
+    def _LaunchUserMode(self):
+        UserMain.Main(parent = self).show()
         
     def _MakeReport(self):
         print('Generating Report...')
@@ -156,6 +160,7 @@ class Main(QtGui.QMainWindow):
         iters = 1000 # (mostly) deprecated
         chunkSize = 8192 #number of samples to read in at once
         numSamples = iters * chunkSize # sets an initial size for our recording buffer
+        windowSize = 5
         
         #set up an audio stream
         p = pyaudio.PyAudio()
@@ -172,7 +177,14 @@ class Main(QtGui.QMainWindow):
         PitchCount = 0
         
         #set up our axes
-        ax = self.ui.TwoD.figure.add_subplot(111)                
+        ax = self.ui.RawPlot.figure.add_subplot(111)
+        ax.set_title('Raw Waveform')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Amplitude')
+        PSDax = self.ui.PSDPlot.figure.add_subplot(111)
+        PSDax.set_title('Power Spectrum')
+        PSDax.set_xlabel('Frequency (Hz)')
+        PSDax.set_ylabel('Power')                
         f0ax = self.ui.FundamentalFrequenncyPlot.figure.add_subplot(111)
         f0ax.tick_params(
                         axis = 'x',
@@ -215,6 +227,7 @@ class Main(QtGui.QMainWindow):
         stdPitch = 0
         STVarPitch = 0
         
+        time = np.linspace(0, numSamples / self.ui.fs, numSamples)
         ds_rate = 3
         #set up time vector
         print('Beginning New Recording')
@@ -227,6 +240,7 @@ class Main(QtGui.QMainWindow):
                 if t > len(self.ui.Recording): # add space to the recording in necessary
                     extraSpace = np.zeros(numSamples, dtype = np.int16)
                     self.ui.Recording = np.concatenate([self.ui.Recording, extraSpace], axis = None)
+                    time = np.linspace(0, len(self.ui.Recording) / self.ui.fs, len(self.ui.Recording))
                     
                 # pull a chunk from our audio stream
                 data = PyAudioTest.getChunk(chunkSize, audioStream, Random = 0)   
@@ -309,10 +323,27 @@ class Main(QtGui.QMainWindow):
                     self.ui.PitchVar.draw()
                     
                 
-                if f0: # if f0 is detected search for formants
-
+                PSDax.clear()
+                PSDax.hold(True)
+                if f0:
                     try:
-                        Formants = FormantFinder.findFormantsLPC(data_ds, self.ui.fs / ds_rate) # look for formants using LPC method
+                        fBins, PSD = sp.signal.periodogram(data_ds, self.ui.fs / ds_rate)
+                        PSD = 20 * np.log10(PSD)
+                        Formants = FormantFinder.findFormantsLPC(data_ds, self.ui.fs / ds_rate)
+                        
+                        for f in range(len(Formants)): # plot the formants as  vertical lines
+                            PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
+                            
+                            
+                        PSDax.plot(fBins, PSD)
+                        PSDax.set_title('Power Spectrum - Formants')
+                        PSDax.set_xlabel('Frequency (Hz)')
+                        PSDax.set_ylabel('Power (dB)')
+                        PSDax.set_ylim((-90, 90))
+                        PSDax.set_xlim((0, 5000))
+                        self.ui.PSDPlot.draw()
+                        PSDax.hold(False)
+
                         
                         #store Formants
                         if len(Formants) >= 5:
@@ -350,23 +381,17 @@ class Main(QtGui.QMainWindow):
                     except (RuntimeError): #formant detection can throw errors sometimes
                         Formants = np.zeros(3)
                 
-                #choose color based on how close we are to the variablility target
-                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - STVarPitch)/self.ui.VarTarget.value()
-                if DiffVar > 1:
-                    DiffVar = 1
-                C = (DiffVar, 1 - DiffVar, 0)
-                #make scatter plot
-                ax.clear()
-                ax.hold(True)
-                ax.scatter([meanPitch], [meanTractLength], color = C)
-                ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
-                ax.set_title('Speech Targeting')
-                ax.set_xlabel('Pitch (Hz)')
-                ax.set_ylabel('Vocal Tract Length (cm)')
-                ax.set_xlim((0, 500))
-                ax.set_ylim((9, 25))
-                self.ui.TwoD.draw()
                 
+                #update our raw data plot, but only everyother chunk, because its time consuming
+                if t > windowSize * self.ui.fs and i % 3 == 0:
+                    ax.plot(time[t - windowSize * self.ui.fs:t], 
+                            self.ui.Recording[t - windowSize * self.ui.fs:t])
+                    ax.set_title('Raw Waveform')
+                    ax.set_xlabel('Time (s)')
+                    ax.set_ylabel('amplitude')
+                    self.ui.RawPlot.draw()
+                    
+                    
                 #keep track of our target values, in case they chane over time
                 if i >= len(self.ui.Time): # add extra space to vectors in case we need it
                     self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
@@ -383,7 +408,7 @@ class Main(QtGui.QMainWindow):
 
         except (KeyboardInterrupt, SystemExit): # in case of a keyboard interrupt or system exit, clean house
             
-            self.ui.TwoD.draw()
+            self.ui.RawPlot.draw()
             self.ui.FundamentalFrequenncyPlot.draw()
             #truncate zero pads
             self.ui.Pitch = self.ui.Pitch[0:PitchCount]
@@ -459,6 +484,7 @@ class Main(QtGui.QMainWindow):
     def _Playback(self): # similar to Go, but uses data from Load instead of collecting new data
         self.ui.Status = True        
         chunkSize = 8192
+        windowSize = 5
         p = pyaudio.PyAudio()
         audioStream = p.open(format = pyaudio.paInt16, channels = 1, rate = self.ui.fs, 
                              input = True, frames_per_buffer = chunkSize)
@@ -471,8 +497,14 @@ class Main(QtGui.QMainWindow):
         PitchCount = 0
         FormantCount = 0
         
-        ax = self.ui.TwoD.figure.add_subplot(111)
-        
+        ax = self.ui.RawPlot.figure.add_subplot(111)
+        ax.set_title('Raw Waveform')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Amplitude')
+        PSDax = self.ui.PSDPlot.figure.add_subplot(111)
+        PSDax.set_title('Power Spectrum')
+        PSDax.set_xlabel('Frequency (Hz)')
+        PSDax.set_ylabel('Power')
         
         f0ax = self.ui.FundamentalFrequenncyPlot.figure.add_subplot(111)
         f0ax.tick_params(
@@ -518,6 +550,7 @@ class Main(QtGui.QMainWindow):
         
         c = 34300 # speed of sound in cm/s
         
+        time = np.linspace(0, numSamples / self.ui.fs, numSamples)
         Count = 0
         t = 0
         print('Beginning Playback')
@@ -596,11 +629,26 @@ class Main(QtGui.QMainWindow):
                     self.ui.PitchVar.draw()
                     
                 
-                
+                PSDax.clear()
+                PSDax.hold(True)
                 if f0:
                     try:
+                        fBins, PSD = sp.signal.periodogram(data_ds, self.ui.fs / ds_rate)
+                        PSD = 20 * np.log10(PSD)
                         Formants = FormantFinder.findFormantsLPC(data_ds, self.ui.fs / ds_rate)
                         
+                        for f in range(len(Formants)): # plot the formants as  vertical lines
+                            PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
+                            
+                            
+                        PSDax.plot(fBins, PSD)
+                        PSDax.set_title('Power Spectrum - Formants')
+                        PSDax.set_xlabel('Frequency (Hz)')
+                        PSDax.set_ylabel('Power (dB)')
+                        PSDax.set_ylim((-90, 90))
+                        PSDax.set_xlim((0, 5000))
+                        self.ui.PSDPlot.draw()
+                        PSDax.hold(False)
                         
                         if len(Formants) >= 5:
                             self.ui.Formants[FormantCount, 0:5] = Formants[0:5]
@@ -635,22 +683,15 @@ class Main(QtGui.QMainWindow):
                             
                     except (RuntimeError):
                         Formants = np.zeros(3)
-                        
-                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - STVarPitch)/self.ui.VarTarget.value()
-                if DiffVar > 1:
-                    DiffVar = 1
-                    
-                C = (DiffVar, 1 - DiffVar, 0)
-                ax.clear()
-                ax.hold(True)
-                ax.scatter([meanPitch], [meanTractLength], color = C)
-                ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
-                ax.set_title('Speech Targeting')
-                ax.set_xlabel('Pitch (Hz)')
-                ax.set_ylabel('Vocal Tract Length (cm)')
-                ax.set_xlim((0, 500))
-                ax.set_ylim((9, 25))
-                self.ui.TwoD.draw()
+                           
+                if t > windowSize * self.ui.fs and Count % 3 == 0:               
+                    ax.plot(time[t - windowSize * self.ui.fs:t], 
+                            self.ui.Recording[t - windowSize * self.ui.fs:t])
+                    plt.xlim(t/self.ui.fs - windowSize, t/self.ui.fs + 1)
+                    ax.set_xlabel('Time (s)')
+                    ax.set_ylabel('amplitude')
+                    ax.set_title('Raw Waveform')
+                    self.ui.RawPlot.draw()
                 
                 if Count >= len(self.ui.Time):
                     self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
@@ -666,7 +707,7 @@ class Main(QtGui.QMainWindow):
                 QtCore.QCoreApplication.processEvents()
                     
         except (KeyboardInterrupt, SystemExit):
-            self.ui.TwoD.draw()
+            self.ui.RawPlot.draw()
             self.ui.FundamentalFrequenncyPlot.draw()
             self.ui.Pitch = self.ui.Pitch[0:PitchCount]
             self.ui.PitchTime = self.ui.PitchTime[0:PitchCount]

@@ -158,7 +158,7 @@ class ReportWindow(QtGui.QDialog):
         
     def RawLineCallback(self, eclick, erelease):
         
-        #[p.remove() for p in reversed(self.ax.patches)]
+        
         RectSelector.line_select_callback(eclick, erelease, parent = self)
         self.ax.clear()
         n = len(self.parent.ui.Recording)
@@ -185,8 +185,40 @@ class ReportWindow(QtGui.QDialog):
                                        minspanx=5, minspany=5,
                                        spancoords='pixels')
         self.ui.RawPlot.show()
-            
-
+        
+        tMin = np.min((self.Coords[0], self.Coords[2]))
+        tMax = np.max((self.Coords[0], self.Coords[2]))
+        pitch_t_min_idx = 0
+        pitch_t_max_idx = 0
+        for i in range(len(self.parent.ui.PitchTime)):
+            if self.parent.ui.PitchTime[i] > tMin and pitch_t_min_idx == 0:
+                pitch_t_min_idx = i
+            if self.parent.ui.PitchTime[i] < tMax:
+                pitch_t_max_idx = i
+        VTL_t_min_idx = 0
+        VTL_t_max_idx = 0
+        for i in range(len(self.parent.ui.FormantTime)):
+            if self.parent.ui.FormantTime[i] > tMin and VTL_t_min_idx == 0:
+                VTL_t_min_idx = i
+            if self.parent.ui.PitchTime[i] < tMax:
+                VTL_t_max_idx = i
+        
+        PitchSelection = self.Pitch[pitch_t_min_idx:pitch_t_max_idx + 1]
+        VarSelection = self.Var[pitch_t_min_idx:pitch_t_max_idx + 1]
+        VTLSelection = self.VTL[VTL_t_min_idx:VTL_t_max_idx + 1]
+        
+        D = tMax - tMin
+        MP = np.nanmean(PitchSelection)
+        MVTL = np.nanmean(VTLSelection)
+        MPV = np.nanmean(VarSelection)
+        RecordingStats = """
+ Selected Time:             (%05.1f, %05.1f)
+ Duration:                   %05.1f seconds
+ Mean Pitch:                 %05.1f Hz
+ Mean Vocal Tract Length:    %05.2f cm
+ Mean Pitch Variability:     %05.2f st        
+        """ %(tMin, tMax, D, MP, MVTL, MPV)
+        self.ui.SelectionText.setText(RecordingStats)
         
         
         

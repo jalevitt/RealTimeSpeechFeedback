@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>995</width>
-    <height>589</height>
+    <width>1046</width>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="MatplotlibWidget" name="TwoD">
+   <widget class="MatplotlibWidget" name="RawPlot">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -82,7 +82,7 @@
       <x>540</x>
       <y>10</y>
       <width>141</width>
-      <height>421</height>
+      <height>301</height>
      </rect>
     </property>
    </widget>
@@ -131,7 +131,7 @@
       <x>690</x>
       <y>10</y>
       <width>141</width>
-      <height>421</height>
+      <height>301</height>
      </rect>
     </property>
    </widget>
@@ -141,11 +141,11 @@
       <x>839</x>
       <y>10</y>
       <width>141</width>
-      <height>421</height>
+      <height>301</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="DevMode">
+   <widget class="QPushButton" name="UserMode">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -155,14 +155,14 @@
      </rect>
     </property>
     <property name="text">
-     <string>Developer Mode</string>
+     <string>User Mode</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="PitchTarget">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>470</y>
+      <x>570</x>
+      <y>360</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -177,8 +177,8 @@
    <widget class="QDoubleSpinBox" name="VTLTarget">
     <property name="geometry">
      <rect>
-      <x>730</x>
-      <y>470</y>
+      <x>710</x>
+      <y>360</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -193,8 +193,8 @@
    <widget class="QDoubleSpinBox" name="VarTarget">
     <property name="geometry">
      <rect>
-      <x>880</x>
-      <y>470</y>
+      <x>870</x>
+      <y>360</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -210,7 +210,7 @@
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>450</y>
+      <y>330</y>
       <width>101</width>
       <height>16</height>
      </rect>
@@ -222,8 +222,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>440</y>
+      <x>700</x>
+      <y>320</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -236,8 +236,8 @@ Tract Length (cm)</string>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>440</y>
+      <x>860</x>
+      <y>320</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -260,13 +260,23 @@ Variability (st)</string>
      <string>Generate Report</string>
     </property>
    </widget>
+   <widget class="MatplotlibWidget" name="PSDPlot">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>390</y>
+      <width>441</width>
+      <height>321</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>995</width>
+     <width>1046</width>
      <height>26</height>
     </rect>
    </property>
