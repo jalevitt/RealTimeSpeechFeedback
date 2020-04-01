@@ -17,7 +17,7 @@ def Gaussian3(x, amp1, mean1, var1, amp2, mean2, var2, amp3, mean3, var3):
     g3 = amp3 * norm.pdf((x - mean3)/var3)
     return g1 + g2 + g3
 
-
+# this was a stupid idea I had early on. disregard.
 # model the PSD as mixture of 3 gaussians, return the means of the gaussians
 # turns out this doesnt work very well :(
 def findGaussianFormantPeaks(FreqBins, PSD):
@@ -42,7 +42,7 @@ def findFormantsLPC(Frame, fs):
     FrameWindowed = Frame * w
     FrameFiltered = sp.signal.lfilter([1], [1., 0.63], FrameWindowed)
     
-    # do LPC, although I don't fully understand what that is
+    # do LPC
     order = 2 + fs / 1000
     A, e, k = scikits.talkbox.lpc(FrameFiltered, order)
     
@@ -71,7 +71,8 @@ def findFormantsLPC(Frame, fs):
     Formants = np.sort(Formants)
         
     return Formants
-    
+
+# find vocal tract length from formants, based on some parameters from the lammert paper
 def getVocalTractLength(Formants, c = 34300, method = 'fd'):
     F = Formants
     lastNonZero = 0
@@ -103,11 +104,3 @@ def getVocalTractLength(Formants, c = 34300, method = 'fd'):
     return L
     
     
-'''    
-x = np.linspace(0, 44100/2, 100)
-print(Gaussian3(x, 300, 300, 150, 100, 800, 150, 80, 1500, 80))
-
-
-N = np.array([1, 2, 3, 4, 5, 6, 7])
-print(N[1:6:2])
-'''
