@@ -20,15 +20,15 @@
       <x>10</x>
       <y>10</y>
       <width>521</width>
-      <height>421</height>
+      <height>301</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="Go">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>440</y>
+      <x>270</x>
+      <y>320</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QPushButton" name="LoadData">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>440</y>
+      <x>20</x>
+      <y>320</y>
       <width>111</width>
       <height>23</height>
      </rect>
@@ -53,8 +53,8 @@
    <widget class="QPushButton" name="PlayBack">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>440</y>
+      <x>140</x>
+      <y>320</y>
       <width>121</width>
       <height>23</height>
      </rect>
@@ -66,8 +66,8 @@
    <widget class="QPushButton" name="Save">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>440</y>
+      <x>350</x>
+      <y>320</y>
       <width>111</width>
       <height>23</height>
      </rect>
@@ -89,8 +89,8 @@
    <widget class="QPushButton" name="Stop">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>470</y>
+      <x>270</x>
+      <y>350</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -102,8 +102,8 @@
    <widget class="QPushButton" name="SaveFormants">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>470</y>
+      <x>350</x>
+      <y>350</y>
       <width>111</width>
       <height>23</height>
      </rect>
@@ -115,8 +115,8 @@
    <widget class="QPushButton" name="SavePitch">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>500</y>
+      <x>350</x>
+      <y>380</y>
       <width>111</width>
       <height>23</height>
      </rect>
@@ -148,8 +148,8 @@
    <widget class="QPushButton" name="UserMode">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>500</y>
+      <x>20</x>
+      <y>380</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -250,8 +250,8 @@ Variability (st)</string>
    <widget class="QPushButton" name="ReportButton">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>470</y>
+      <x>140</x>
+      <y>350</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -264,9 +264,19 @@ Variability (st)</string>
     <property name="geometry">
      <rect>
       <x>540</x>
-      <y>390</y>
+      <y>410</y>
       <width>441</width>
-      <height>321</height>
+      <height>301</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="MatplotlibWidget" name="FormantPlot">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>409</y>
+      <width>521</width>
+      <height>301</height>
      </rect>
     </property>
    </widget>

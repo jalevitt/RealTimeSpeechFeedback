@@ -51,9 +51,9 @@ class ReportWindow(QtGui.QDialog):
                         labelleft = False)
         # set up rectangle selector widget
         self.Rect = RectSelector.PersistRectangleSelector(self.ax, self.RawLineCallbackWrapper,
-                                       drawtype='box', useblit=False,
+                                       drawtype='box', useblit=True,
                                        button=[1, 3],  # don't use middle button
-                                       minspanx=5, minspany=5,
+                                       minspanx=0.1, minspany=0,
                                        spancoords='pixels')
 
         self.ui.RawPlot.show()
@@ -168,62 +168,36 @@ class ReportWindow(QtGui.QDialog):
 
 
 
-        
+        # this is the function called by the wrapper. this is the business.
     def RawLineCallback(self, eclick, erelease):
         
         # call the line selectro callback
         RectSelector.line_select_callback(eclick, erelease, parent = self)
-        
-        # rebuild the graph
-        self.ax.clear()
-        self.ax = self.ui.RawPlot.figure.add_subplot(111)
-        n = len(self.parent.ui.Recording)
-        Time = np.linspace(0, 1.0 * n/self.parent.ui.fs, n)
-        self.ax = self.ui.RawPlot.figure.add_subplot(111)
-        self.ax.set_position([0.12, 0.25, 0.85, 0.63])
-        self.ax.plot(Time, self.parent.ui.Recording)
-        self.ax.set_title('Raw Waveform')
-        self.ax.set_ylabel('Amplitude')
-        self.ax.set_xlabel('Time (s)')
-        self.ax.set_xlim((0, 1.0 * n/self.parent.ui.fs))
-        self.ax.tick_params(
-                        axis = 'y',
-                        which = 'both',
-                        left = False,
-                        right = False,
-                        labelleft = False)
-        
-        # reinitialize the rectangle selector
-        self.Rect = RectSelector.PersistRectangleSelector(self.ax, self.RawLineCallbackWrapper,
-                                       drawtype='box', useblit=False,
-                                       button=[1, 3],  # don't use middle button
-                                       minspanx=5, minspany=5,
-                                       spancoords='pixels')
-        self.ui.RawPlot.show()
-        
+
         # calculate variables for text area
         tMin = np.min((self.Coords[0], self.Coords[2]))
         tMax = np.max((self.Coords[0], self.Coords[2]))
         pitch_t_min_idx = 0
         pitch_t_max_idx = 0
-        for i in range(len(self.parent.ui.PitchTime)):
+        for i in range(len(self.parent.ui.PitchTime)): # first get pitches in the selected area
             if self.parent.ui.PitchTime[i] > tMin and pitch_t_min_idx == 0:
                 pitch_t_min_idx = i
             if self.parent.ui.PitchTime[i] < tMax:
                 pitch_t_max_idx = i
         VTL_t_min_idx = 0
         VTL_t_max_idx = 0
-        for i in range(len(self.parent.ui.FormantTime)):
+        for i in range(len(self.parent.ui.FormantTime)): # then get VTL in the selected area
             if self.parent.ui.FormantTime[i] > tMin and VTL_t_min_idx == 0:
                 VTL_t_min_idx = i
-            if self.parent.ui.PitchTime[i] < tMax:
+            if self.parent.ui.FormantTime[i] < tMax:
                 VTL_t_max_idx = i
         
         PitchSelection = self.Pitch[pitch_t_min_idx:pitch_t_max_idx + 1]
         VarSelection = self.Var[pitch_t_min_idx:pitch_t_max_idx + 1]
         VTLSelection = self.VTL[VTL_t_min_idx:VTL_t_max_idx + 1]
         
-        D = tMax - tMin
+        # calculate the size of the selection, and the means of the variables
+        D = tMax - tMin 
         MP = np.nanmean(PitchSelection)
         MVTL = np.nanmean(VTLSelection)
         MPV = np.nanmean(VarSelection)

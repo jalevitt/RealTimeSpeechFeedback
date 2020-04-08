@@ -283,13 +283,14 @@ class Main(QtGui.QMainWindow):
                         
                     if len(RecentPitches) > 1:
                         stdPitch = np.std(RecentPitches)
-                        meanPitch = np.mean(RecentPitches)
+                        mPitch = np.mean(RecentPitches)
                     else:
                         stdPitch = 0
+                        mPitch = 1
                     
                     #convert to semitones
                     RPitch = np.array(RecentPitches)
-                    RPitch = 39.86 * np.log10(RPitch / meanPitch)
+                    RPitch = 39.86 * np.log10(RPitch / mPitch)
                     
                     if len(RPitch) > 1:
                         STVarPitch = np.std(RPitch)
@@ -571,13 +572,14 @@ class Main(QtGui.QMainWindow):
                         
                     if len(RecentPitches) > 1:
                         stdPitch = np.std(RecentPitches)
-                        meanPitch = np.mean(RecentPitches)
+                        mPitch = np.mean(RecentPitches)
                     else:
                         stdPitch = 0
+                        mPitch = 1
                     
                     #convert to semitones
                     RPitch = np.array(RecentPitches)
-                    RPitch = 39.86 * np.log10(RPitch / meanPitch)
+                    RPitch = 39.86 * np.log10(RPitch / mPitch)
                     
                     if len(RPitch) > 1:
                         STVarPitch = np.std(RPitch)
