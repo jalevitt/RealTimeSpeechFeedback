@@ -32,11 +32,12 @@ warnings.filterwarnings("ignore")
 class Main(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
+        # build UI
         self.ui = DeveloperUI.Ui_MainWindow()
         self.ui.setupUi(self)
         
         
-        # set up button callbacks  
+        # connect button callbacks  
         
         self.ui.Go.clicked.connect(self._GoRun)
         self.ui.LoadData.clicked.connect(self._Load)
@@ -47,6 +48,7 @@ class Main(QtGui.QMainWindow):
         self.ui.SavePitch.clicked.connect(self._SaveP)
         self.ui.ReportButton.clicked.connect(self._MakeReport)
         self.ui.UserMode.clicked.connect(self._LaunchUserMode)
+        self.ui.PlotSpectrogram.clicked.connect(self._AddSpec)
         
         # set up some vriables
         self.ui.Recording = np.zeros(100000, dtype = np.int16)
@@ -112,6 +114,28 @@ class Main(QtGui.QMainWindow):
         self.FormantAx.set_ylabel('Frequency (Hz)')
         self.FormantAx.set_xlabel('Time (s)')
         self.FormantAx.set_ylim((0, 5000))
+        
+    def _AddSpec(self):
+        if not self.ui.Status: #make sure the recording isn't running first
+            FormantScatterColors = ['black', 'dimgrey', 'darkgray', 'silver', 'gainsboro', 'whitesmoke']
+            self.FormantAx.clear()        # clear the axes
+            self.FormantAx.hold(True)
+            # make the spectrogram
+            spec, f, t, im = self.FormantAx.specgram(self.ui.Recording, NFFT = 2 ** 14, 
+                                                     Fs = self.ui.fs, noverlap = 2 ** 13)
+            # add our formant dots
+            for i in range(len(self.ui.FormantTime)):
+                for f in range(5):
+                    if self.ui.Formants[i, f] != 0:
+                        self.FormantAx.scatter(self.ui.FormantTime[i], self.ui.Formants[i, f], color = FormantScatterColors[f])
+            xmin, xmax = self.ax.get_xlim()
+            self.FormantAx.set_xlim((xmin, xmax))
+            self.FormantAx.set_ylim((0, 5000))
+            self.FormantAx.set_title('Formants')
+            self.FormantAx.set_ylabel('Frequency (Hz)')
+            self.FormantAx.set_xlabel('Time (s)')
+            self.ui.FormantPlot.draw()
+            
         
     def _LaunchUserMode(self):
         UserMain.Main(parent = self).show()
@@ -228,6 +252,7 @@ class Main(QtGui.QMainWindow):
         self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 0.8))
         self.FormantAx = self.ui.FormantPlot.figure.add_subplot(111)
+        self.FormantAx.clear()
         self.FormantAx.set_ylabel('Frequency (Hz)')
         self.FormantAx.set_xlabel('Time (s)')
         self.FormantAx.set_ylim((0, 5000))
@@ -238,6 +263,7 @@ class Main(QtGui.QMainWindow):
         maxVocalLag = 3 #winodw size for calculating VTL in sec
         maxPitchVarLag = 10 #window size for calculating pitch var in sec
         
+        FormantScatterColors = ['black', 'dimgrey', 'darkgray', 'silver', 'gainsboro', 'whitesmoke']
         #initialize vars
         meanPitch = 0
         meanTractLength = 0
@@ -358,7 +384,7 @@ class Main(QtGui.QMainWindow):
                         for f in range(len(Formants)): # plot the formants as  vertical lines
                             self.PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
                             # plot formants as scatter points
-                            self.FormantAx.scatter(self.ui.FormantTime[FormantCount], Formants[f], color = 'black')
+                            self.FormantAx.scatter(self.ui.FormantTime[FormantCount], Formants[f], color = FormantScatterColors[f])
                             
                         self.PSDax.plot(fBins, PSD)
                         self.PSDax.set_title('Power Spectrum - Formants')
@@ -585,6 +611,7 @@ class Main(QtGui.QMainWindow):
         self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 0.8))
         self.FormantAx = self.ui.FormantPlot.figure.add_subplot(111)
+        self.FormantAx.clear()
         self.FormantAx.set_ylabel('Frequency (Hz)')
         self.FormantAx.set_xlabel('Time (s)')
         self.FormantAx.set_ylim((0, 5000))
@@ -597,7 +624,7 @@ class Main(QtGui.QMainWindow):
         meanTractLength = 0
         stdPitch = 0
         STVarPitch = 0
-        
+        FormantScatterColors = ['black', 'dimgrey', 'darkgray', 'silver', 'gainsboro', 'whitesmoke']
         
         ds_rate = 3
         
@@ -700,7 +727,7 @@ class Main(QtGui.QMainWindow):
                         
                         for f in range(len(Formants)): # plot the formants as  vertical lines
                             self.PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
-                            self.FormantAx.scatter(self.ui.FormantTime[FormantCount], Formants[f], color = 'black')
+                            self.FormantAx.scatter(self.ui.FormantTime[FormantCount], Formants[f], color = FormantScatterColors[f])
                             
                         self.PSDax.plot(fBins, PSD)
                         self.PSDax.set_title('Power Spectrum - Formants')

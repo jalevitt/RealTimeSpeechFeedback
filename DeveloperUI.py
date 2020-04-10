@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Documents\RealTimeSpeechFeedback-working\DeveloperUI.ui'
 #
-# Created: Mon Apr 06 08:59:41 2020
+# Created: Fri Apr 10 11:02:32 2020
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -98,6 +98,9 @@ class Ui_MainWindow(object):
         self.FormantPlot = MatplotlibWidget(self.centralwidget)
         self.FormantPlot.setGeometry(QtCore.QRect(10, 409, 521, 301))
         self.FormantPlot.setObjectName(_fromUtf8("FormantPlot"))
+        self.PlotSpectrogram = QtGui.QPushButton(self.centralwidget)
+        self.PlotSpectrogram.setGeometry(QtCore.QRect(140, 378, 121, 21))
+        self.PlotSpectrogram.setObjectName(_fromUtf8("PlotSpectrogram"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1046, 26))
@@ -128,15 +131,7 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Target Pitch\n"
 "Variability (st)", None))
         self.ReportButton.setText(_translate("MainWindow", "Generate Report", None))
+        self.PlotSpectrogram.setText(_translate("MainWindow", "Plot Spectrogram", None))
         self.myCallback.setText(_translate("MainWindow", "Test", None))
 
 from matplotlibwidget import MatplotlibWidget
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
