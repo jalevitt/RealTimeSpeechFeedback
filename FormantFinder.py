@@ -17,7 +17,7 @@ def Gaussian3(x, amp1, mean1, var1, amp2, mean2, var2, amp3, mean3, var3):
     g3 = amp3 * norm.pdf((x - mean3)/var3)
     return g1 + g2 + g3
 
-
+# this was a stupid idea I had early on. disregard.
 # model the PSD as mixture of 3 gaussians, return the means of the gaussians
 # turns out this doesnt work very well :(
 def findGaussianFormantPeaks(FreqBins, PSD):
@@ -42,7 +42,7 @@ def findFormantsLPC(Frame, fs):
     FrameWindowed = Frame * w
     FrameFiltered = sp.signal.lfilter([1], [1., 0.63], FrameWindowed)
     
-    # do LPC, although I don't fully understand what that is
+    # do LPC
     order = 2 + fs / 1000
     A, e, k = scikits.talkbox.lpc(FrameFiltered, order)
     
@@ -63,7 +63,7 @@ def findFormantsLPC(Frame, fs):
     Formants = np.zeros(len(freqs))
     nFormants = 0
     for i in range(len(freqs)):
-        if freqs[i] > 90 and freqs[i] < 5000 and bandWidth[i] < 400:
+        if freqs[i] > 90 and freqs[i] < 5000 and bandWidth[i] < 500:
             Formants[nFormants] = freqs[i]
             nFormants += 1
             
@@ -71,17 +71,32 @@ def findFormantsLPC(Frame, fs):
     Formants = np.sort(Formants)
         
     return Formants
-    
-def getVocalTractLength(Formants, c, method = 'fd'):  
-    if method == 'fd':
-        if len(Formants) == 1:
-            L = c / (4 *  Formants[0])
-        elif len(Formants) > 1:
-            m = len(Formants)
-            theta = Formants[0] / (2 * m - 1) + Formants[-1] / (2 * m - 1)
+
+# find vocal tract length from formants, based on some parameters from the lammert paper
+def getVocalTractLength(Formants, c = 34300, method = 'fd'):
+    F = Formants
+    lastNonZero = 0
+    for i in range(len(F)):
+        if F[i] != 0:
+            lastNonZero = i
+            
+    F = F[0:lastNonZero + 1]
+    if method == 'fd': #Frequency Dispersion method
+        if len(F) == 1:
+            L = c / (4 *  F[0])
+        elif len(F) > 1:
+            m = len(F)
+            theta = -1 * F[0] / (2 * m - 1) + F[-1] / (2 * m - 1)
             L = c / (4 * theta)
         else:
             L = np.nan
+            
+    elif method == 'lammert': #Lammert Method
+        beta = [0.3, 0.082, 0.124, 0.354]
+        theta = 229
+        for i in range(np.min([4, len(F)])):
+            theta += F[i] * beta[i] / (2 * i - 1)
+        L = c / (4 * theta)
     else:
         print('Invalid Vocal Tract Estimator technique')
         return False
@@ -89,11 +104,3 @@ def getVocalTractLength(Formants, c, method = 'fd'):
     return L
     
     
-'''    
-x = np.linspace(0, 44100/2, 100)
-print(Gaussian3(x, 300, 300, 150, 100, 800, 150, 80, 1500, 80))
-
-
-N = np.array([1, 2, 3, 4, 5, 6, 7])
-print(N[1:6:2])
-'''
