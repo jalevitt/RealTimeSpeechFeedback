@@ -208,9 +208,9 @@ def compareYinPRAAT(YinPitch, PRAATPitch, robust = True):
     ax.set_title('Fundamental Frequency')
     plt.show()
 
-FormantCSVPath = 'R:\SteppLab\Members\Josh_Levitt\TestData_LabOnly\FormantCSV.csv'
-WavPath = 'R:\SteppLab\Members\Josh_Levitt\TestData_LabOnly\LSP01_intelligibility.wav'
-PitchCSVPath = 'R:\SteppLab\Members\Josh_Levitt\TestData_LabOnly\PitchCSV.txt'
+FormantCSVPath = ''
+WavPath = 'C:\Users\Josh Levitt\Documents\RealTimeSpeechFeedback-working\TestData\JoshTestVon.wav'
+PitchCSVPath = 'C:\Users\Josh Levitt\Documents\RealTimeSpeechFeedback-working\TestData\JoshTestVonF0_PRAAT.csv'
 fs, AudioData = ReadAudioFile(WavPath)
 '''
 PraatFormantData = ReadFormantCSV(FormantCSVPath)

@@ -121,7 +121,7 @@ def cumulativeMeanNormalizedDifferenceFunction(df, N):
 
 
 
-def getPitch(cmdf, tau_min, tau_max, harmo_th=0.1):
+def getPitch(cmdf, tau_min, tau_max, harmo_th=0.1, method = 'Josh'):
     """
     Return fundamental period of a frame based on CMND function.
 
@@ -132,15 +132,24 @@ def getPitch(cmdf, tau_min, tau_max, harmo_th=0.1):
     :return: fundamental period if there is values under threshold, 0 otherwise
     :rtype: float
     """
-    tau = tau_min
-    while tau < tau_max:
-        if cmdf[tau] < harmo_th:
-            while tau + 1 < tau_max and cmdf[tau + 1] < cmdf[tau]:
-                tau += 1
-            return tau
-        tau += 1
-
-    return 0    # if unvoiced
+    if method == 'Josh':
+        c = cmdf[tau_min:tau_max]
+        tau = np.argmin(c)
+        if c[tau] > harmo_th:
+            return 0
+        else:
+            return tau + tau_min
+    
+    else:
+        tau = tau_min
+        while tau < tau_max:
+            if cmdf[tau] < harmo_th:
+                while tau + 1 < tau_max and cmdf[tau + 1] < cmdf[tau]:
+                    tau += 1
+                return tau
+            tau += 1
+    
+        return 0    # if unvoiced
 
 
 

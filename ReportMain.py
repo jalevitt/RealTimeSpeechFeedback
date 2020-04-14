@@ -75,12 +75,14 @@ class ReportWindow(QtGui.QDialog):
         self.f0ax = self.ui.PitchPlot.figure.add_subplot(111)
         self.f0ax.set_position([0.12, 0.25, 0.85, 0.63])
         self.f0ax.hold(True)
-        self.f0ax.plot(parent.ui.Time, parent.ui.Targets[:, 0], color = 'black')
-        self.f0ax.scatter(parent.ui.PitchTime, Pitch)
+        self.f0ax.plot(parent.ui.Time, parent.ui.Targets[:, 0], color = 'aqua')
+        self.f0ax.plot(parent.ui.Time, parent.ui.Targets[:, 0] + parent.ui.Targets[:, 3], color = 'aqua', linestyle = 'dashed')
+        self.f0ax.plot(parent.ui.Time, parent.ui.Targets[:, 0] - parent.ui.Targets[:, 3], color = 'aqua', linestyle = 'dashed')
+        self.f0ax.scatter(parent.ui.PitchTime, Pitch, color = 'black')
         self.f0ax.set_ylim((0, 500))
         self.f0ax.set_xlim((0, 1.0 * n/parent.ui.fs))
-        self.f0ax.set_title('Pitch')
-        self.f0ax.set_ylabel('Pitch (Hz)')
+        self.f0ax.set_title('Fundemental Frequency')
+        self.f0ax.set_ylabel('Fundemental Frequency (Hz)')
         self.f0ax.set_xlabel('Time (s)')
         self.ui.PitchPlot.show()
         
@@ -104,8 +106,10 @@ class ReportWindow(QtGui.QDialog):
         self.VTLax = self.ui.VTLPlot.figure.add_subplot(111)
         self.VTLax.set_position([0.12, 0.25, 0.85, 0.63])
         self.VTLax.hold(True)
-        self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1], color = 'black')
-        self.VTLax.scatter(parent.ui.FormantTime, VTL)
+        self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1], color = 'aqua')
+        self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1] + parent.ui.Targets[:, 4], color = 'aqua', linestyle = 'dashed')
+        self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1] - parent.ui.Targets[:, 4], color = 'aqua', linestyle = 'dashed')
+        self.VTLax.scatter(parent.ui.FormantTime, VTL,  color = 'black')
         self.VTLax.set_ylim((0, 25))
         self.VTLax.set_xlim((0, 1.0 * n/parent.ui.fs))
         self.VTLax.set_title('Vocal Tract Length')
@@ -132,12 +136,14 @@ class ReportWindow(QtGui.QDialog):
         self.VarAx = self.ui.VarPlot.figure.add_subplot(111)
         self.VarAx.set_position([0.12, 0.25, 0.85, 0.63])
         self.VarAx.hold(True)
-        self.VarAx.plot(parent.ui.Time, parent.ui.Targets[:, 2], color = 'black')
-        self.VarAx.scatter(parent.ui.PitchTime, Var)
+        self.VarAx.plot(parent.ui.Time, parent.ui.Targets[:, 2], color = 'aqua')
+        self.VarAx.plot(parent.ui.Time, parent.ui.Targets[:, 2] + parent.ui.Targets[:, 5], color = 'aqua', linestyle = 'dashed')
+        self.VarAx.plot(parent.ui.Time, parent.ui.Targets[:, 2] - parent.ui.Targets[:, 5], color = 'aqua', linestyle = 'dashed')
+        self.VarAx.scatter(parent.ui.PitchTime, Var,  color = 'black')
         self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 1.0 * n/parent.ui.fs))
-        self.VarAx.set_title('Pitch Variability')
-        self.VarAx.set_ylabel('Pitch Variability (Hz)')
+        self.VarAx.set_title('F0 Variability')
+        self.VarAx.set_ylabel('Fundemental Frequency Variability (st)')
         self.VarAx.set_xlabel('Time (s)')
         self.ui.VarPlot.show()
         
@@ -149,9 +155,9 @@ class ReportWindow(QtGui.QDialog):
         # set text
         RecordingStats = """
  Duration:                   %05.1f seconds
- Mean Pitch:                 %05.1f Hz
+ Mean Fundemental Frequency: %05.1f Hz
  Mean Vocal Tract Length:    %05.2f cm
- Mean Pitch Variability:     %05.2f st        
+ Mean F0 Variability:        %05.2f st        
         """ %(D, MP, MVTL, MPV)
         self.ui.RecordingText.setText(RecordingStats)
         
@@ -206,9 +212,9 @@ class ReportWindow(QtGui.QDialog):
         RecordingStats = """
  Selected Time:             (%05.1f, %05.1f)
  Duration:                   %05.1f seconds
- Mean Pitch:                 %05.1f Hz
+ Mean Fundemental Frequency: %05.1f Hz
  Mean Vocal Tract Length:    %05.2f cm
- Mean Pitch Variability:     %05.2f st        
+ Mean F0 Variability:        %05.2f st        
         """ %(tMin, tMax, D, MP, MVTL, MPV)
         self.ui.SelectionText.setText(RecordingStats)
         

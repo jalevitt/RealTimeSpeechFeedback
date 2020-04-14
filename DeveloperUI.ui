@@ -122,7 +122,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Save Pitch</string>
+     <string>Save F0</string>
     </property>
    </widget>
    <widget class="MatplotlibWidget" name="VocalTractPlot">
@@ -162,7 +162,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>360</y>
+      <y>350</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -178,7 +178,7 @@
     <property name="geometry">
      <rect>
       <x>710</x>
-      <y>360</y>
+      <y>350</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -194,7 +194,7 @@
     <property name="geometry">
      <rect>
       <x>870</x>
-      <y>360</y>
+      <y>350</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -209,21 +209,22 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>330</y>
-      <width>101</width>
-      <height>16</height>
+      <x>550</x>
+      <y>310</y>
+      <width>121</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Target Pitch (Hz)</string>
+     <string>Target Fundemental
+Frequency (Hz)</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>320</y>
+      <y>310</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -237,13 +238,13 @@ Tract Length (cm)</string>
     <property name="geometry">
      <rect>
       <x>860</x>
-      <y>320</y>
+      <y>310</y>
       <width>91</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Target Pitch
+     <string>Target F0
 Variability (st)</string>
     </property>
    </widget>
@@ -291,6 +292,80 @@ Variability (st)</string>
     </property>
     <property name="text">
      <string>Plot Spectrogram</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="F0Range">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>380</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>10.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="VTLRange">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>380</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>10.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="VarRange">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>380</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>10.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>380</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Range (%)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PlotSwitch">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>410</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Switch Mode</string>
     </property>
    </widget>
   </widget>

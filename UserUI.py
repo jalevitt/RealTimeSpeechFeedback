@@ -5,20 +5,14 @@ Created on Mon Mar 09 10:36:31 2020
 @author: jalevitt
 """
 
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'R:\SteppLab\Members\Josh_Levitt\TestUI.ui'
+# Form implementation generated from reading ui file 'UserUI.ui'
 #
-# Created: Mon Mar 09 10:34:14 2020
+# Created: Mon Apr 13 14:02:12 2020
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
-from matplotlibwidget import MatplotlibWidget
-
-
-
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -36,7 +30,6 @@ except AttributeError:
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        # set up the appearance of our ui, button names, locations etc
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(995, 589)
         self.centralwidget = QtGui.QWidget(MainWindow)
@@ -75,35 +68,53 @@ class Ui_MainWindow(object):
         self.PitchVar.setGeometry(QtCore.QRect(839, 10, 141, 421))
         self.PitchVar.setObjectName(_fromUtf8("PitchVar"))
         self.DevMode = QtGui.QPushButton(self.centralwidget)
-        self.DevMode.setGeometry(QtCore.QRect(10, 500, 111, 23))
+        self.DevMode.setGeometry(QtCore.QRect(10, 500, 111, 21))
         self.DevMode.setObjectName(_fromUtf8("DevMode"))
         self.PitchTarget = QtGui.QDoubleSpinBox(self.centralwidget)
-        self.PitchTarget.setGeometry(QtCore.QRect(580, 470, 62, 22))
+        self.PitchTarget.setGeometry(QtCore.QRect(580, 460, 62, 22))
         self.PitchTarget.setMaximum(500.0)
         self.PitchTarget.setProperty("value", 100.0)
         self.PitchTarget.setObjectName(_fromUtf8("PitchTarget"))
         self.VTLTarget = QtGui.QDoubleSpinBox(self.centralwidget)
-        self.VTLTarget.setGeometry(QtCore.QRect(730, 470, 62, 22))
+        self.VTLTarget.setGeometry(QtCore.QRect(730, 460, 62, 22))
         self.VTLTarget.setMaximum(25.0)
         self.VTLTarget.setProperty("value", 15.0)
         self.VTLTarget.setObjectName(_fromUtf8("VTLTarget"))
         self.VarTarget = QtGui.QDoubleSpinBox(self.centralwidget)
-        self.VarTarget.setGeometry(QtCore.QRect(880, 470, 62, 22))
+        self.VarTarget.setGeometry(QtCore.QRect(880, 460, 62, 22))
         self.VarTarget.setMaximum(100.0)
-        self.VarTarget.setProperty("value", 5.0)
+        self.VarTarget.setProperty("value", 15.0)
         self.VarTarget.setObjectName(_fromUtf8("VarTarget"))
         self.label = QtGui.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(560, 450, 101, 16))
+        self.label.setGeometry(QtCore.QRect(550, 430, 121, 31))
         self.label.setObjectName(_fromUtf8("label"))
         self.label_2 = QtGui.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(720, 440, 121, 31))
+        self.label_2.setGeometry(QtCore.QRect(720, 430, 121, 31))
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.label_3 = QtGui.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(870, 440, 91, 31))
+        self.label_3.setGeometry(QtCore.QRect(870, 430, 91, 31))
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.ReportButton = QtGui.QPushButton(self.centralwidget)
-        self.ReportButton.setGeometry(QtCore.QRect(130, 470, 121, 23))
+        self.ReportButton.setGeometry(QtCore.QRect(130, 470, 121, 21))
         self.ReportButton.setObjectName(_fromUtf8("ReportButton"))
+        self.VarRange = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.VarRange.setGeometry(QtCore.QRect(880, 490, 62, 22))
+        self.VarRange.setMaximum(100.0)
+        self.VarRange.setProperty("value", 10.0)
+        self.VarRange.setObjectName(_fromUtf8("VarRange"))
+        self.label_4 = QtGui.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(500, 490, 71, 20))
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.VTLRange = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.VTLRange.setGeometry(QtCore.QRect(730, 490, 62, 22))
+        self.VTLRange.setMaximum(100.0)
+        self.VTLRange.setProperty("value", 10.0)
+        self.VTLRange.setObjectName(_fromUtf8("VTLRange"))
+        self.F0Range = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.F0Range.setGeometry(QtCore.QRect(580, 490, 62, 22))
+        self.F0Range.setMaximum(100.0)
+        self.F0Range.setProperty("value", 10.0)
+        self.F0Range.setObjectName(_fromUtf8("F0Range"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 995, 26))
@@ -117,31 +128,25 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        
 
     def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.Go.setText(_translate("MainWindow", "Go", None))
         self.LoadData.setText(_translate("MainWindow", "Load Existing Data", None))
         self.PlayBack.setText(_translate("MainWindow", "Playback Recording", None))
         self.Save.setText(_translate("MainWindow", "Save .wav", None))
         self.Stop.setText(_translate("MainWindow", "Stop", None))
         self.SaveFormants.setText(_translate("MainWindow", "Save Formants", None))
-        self.SavePitch.setText(_translate("MainWindow", "Save Pitch", None))
+        self.SavePitch.setText(_translate("MainWindow", "Save F0", None))
         self.DevMode.setText(_translate("MainWindow", "Developer Mode", None))
-        self.label.setText(_translate("MainWindow", "Target Pitch (Hz)", None))
+        self.label.setText(_translate("MainWindow", "Target Fundemental\n"
+"Frequency (Hz)", None))
         self.label_2.setText(_translate("MainWindow", "Target Vocal \n"
 "Tract Length (cm)", None))
-        self.label_3.setText(_translate("MainWindow", "Target Pitch\n"
+        self.label_3.setText(_translate("MainWindow", "Target F0\n"
 "Variability (st)", None))
         self.ReportButton.setText(_translate("MainWindow", "Generate Report", None))
+        self.label_4.setText(_translate("MainWindow", "Range (%)", None))
         self.myCallback.setText(_translate("MainWindow", "Test", None))
-        
 
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+from matplotlibwidget import MatplotlibWidget
