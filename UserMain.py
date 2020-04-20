@@ -308,7 +308,7 @@ class Main(QtGui.QMainWindow):
                     VarAx.hold(True)
                     VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
                     VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
-                    VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    VarAx.set_ylabel('F0 Variability (Semitones)')
                     VarAx.set_ylim((0, 25))
                     VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
@@ -365,10 +365,11 @@ class Main(QtGui.QMainWindow):
                 #make scatter plot
                 ax.clear()
                 ax.hold(True)
-                rect = patches.Rectangle((self.ui.PitchTarget.value() - 0.5 * self.ui.F0Range.value(),
-                                          self.ui.VTLTarget.value() - 0.5 * self.ui.VTLRange.value()),
-                                        self.ui.F0Range.value(), self.ui.VTLRange.value(), 
-                                        linewidth=0.5, edgecolor='none',facecolor='aqua')
+                rect = patches.Rectangle((self.ui.PitchTarget.value() - 0.5 * 0.01 * self.ui.PitchTarget.value() * self.ui.F0Range.value(),
+                                          self.ui.VTLTarget.value() - 0.5 * 0.01 * self.ui.VTLTarget.value()* self.ui.VTLRange.value()),
+                                        0.01 * self.ui.PitchTarget.value() * self.ui.F0Range.value(),
+                                        0.01 * self.ui.VTLTarget.value()* self.ui.VTLRange.value(), 
+                                        linewidth=0.5, edgecolor='none',facecolor='aqua', alpha = 0.5)
                 ax.add_patch(rect)
                 ax.scatter([meanPitch], [meanTractLength], color = C)
                 #ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
@@ -376,7 +377,7 @@ class Main(QtGui.QMainWindow):
                 ax.set_xlabel('Fundemental Frequency (Hz)')
                 ax.set_ylabel('Vocal Tract Length (cm)')
                 ax.set_xlim((0, 500))
-                ax.set_ylim((9, 25))
+                ax.set_ylim((0, 25))
                 self.ui.TwoD.draw()
                 
                 #keep track of our target values, in case they chane over time
@@ -472,6 +473,12 @@ class Main(QtGui.QMainWindow):
         return True
         
     def _Playback(self): # similar to Go, but uses data from Load instead of collecting new data
+    
+        # make sure we actually have some data loaded
+        if np.sum(self.ui.Recording) == 0:
+            print('No data loaded, or loaded data is empty. Aborting playback')
+            return False
+            
         self.ui.Status = True        
         chunkSize = 8192
         p = pyaudio.PyAudio()
@@ -610,7 +617,7 @@ class Main(QtGui.QMainWindow):
                     VarAx.hold(True)
                     VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
                     VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
-                    VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    VarAx.set_ylabel('F0 Variability (Semitones)')
                     VarAx.set_ylim((0, 25))
                     VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
@@ -681,7 +688,7 @@ class Main(QtGui.QMainWindow):
                 ax.set_xlabel('Fundemental Frequency (Hz)')
                 ax.set_ylabel('Vocal Tract Length (cm)')
                 ax.set_xlim((0, 500))
-                ax.set_ylim((9, 25))
+                ax.set_ylim((0, 25))
                 self.ui.TwoD.draw()
                 
                 if Count >= len(self.ui.Time):

@@ -6,375 +6,212 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1046</width>
-    <height>762</height>
+    <width>909</width>
+    <height>766</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="MatplotlibWidget" name="RawPlot">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>521</width>
-      <height>301</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Go">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>320</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Go</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="LoadData">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>320</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Existing Data</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="PlayBack">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>320</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Playback Recording</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Save">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>320</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save .wav</string>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="FundamentalFrequenncyPlot">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>10</y>
-      <width>141</width>
-      <height>301</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Stop">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>350</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stop</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="SaveFormants">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>350</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save Formants</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="SavePitch">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>380</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save F0</string>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="VocalTractPlot">
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>10</y>
-      <width>141</width>
-      <height>301</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="PitchVar">
-    <property name="geometry">
-     <rect>
-      <x>839</x>
-      <y>10</y>
-      <width>141</width>
-      <height>301</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="UserMode">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>380</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>User Mode</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="PitchTarget">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>350</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>500.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>100.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="VTLTarget">
-    <property name="geometry">
-     <rect>
-      <x>710</x>
-      <y>350</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>25.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>15.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="VarTarget">
-    <property name="geometry">
-     <rect>
-      <x>870</x>
-      <y>350</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>100.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>15.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>310</y>
-      <width>121</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Target Fundemental
-Frequency (Hz)</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>310</y>
-      <width>121</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Target Vocal 
-Tract Length (cm)</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>860</x>
-      <y>310</y>
-      <width>91</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Target F0
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="6" column="5">
+     <widget class="QPushButton" name="SavePitch">
+      <property name="text">
+       <string>Save F0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="6">
+     <widget class="MatplotlibWidget" name="RawPlot"/>
+    </item>
+    <item row="1" column="15" colspan="5">
+     <widget class="MatplotlibWidget" name="PitchVar"/>
+    </item>
+    <item row="4" column="4">
+     <widget class="QPushButton" name="Stop">
+      <property name="text">
+       <string>Stop</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="2">
+     <widget class="QPushButton" name="UserMode">
+      <property name="text">
+       <string>User Mode</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="17" colspan="2">
+     <widget class="QDoubleSpinBox" name="VarTarget">
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>15.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="16" rowspan="2" colspan="3">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Target F0
 Variability (st)</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="ReportButton">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>350</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Generate Report</string>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="PSDPlot">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>410</y>
-      <width>441</width>
-      <height>301</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="FormantPlot">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>409</y>
-      <width>521</width>
-      <height>301</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="PlotSpectrogram">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>378</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Plot Spectrogram</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="F0Range">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>380</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>100.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>10.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="VTLRange">
-    <property name="geometry">
-     <rect>
-      <x>710</x>
-      <y>380</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>100.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>10.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="VarRange">
-    <property name="geometry">
-     <rect>
-      <x>870</x>
-      <y>380</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>100.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>10.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>380</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Range (%)</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="PlotSwitch">
-    <property name="geometry">
-     <rect>
-      <x>890</x>
-      <y>410</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Switch Mode</string>
-    </property>
-   </widget>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="3" rowspan="2">
+     <widget class="QPushButton" name="PlotSpectrogram">
+      <property name="text">
+       <string>Plot Spectrogram</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="5">
+     <widget class="QPushButton" name="Save">
+      <property name="text">
+       <string>Save .wav</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="7" colspan="4">
+     <widget class="MatplotlibWidget" name="FundamentalFrequenncyPlot"/>
+    </item>
+    <item row="6" column="17" colspan="2">
+     <widget class="QDoubleSpinBox" name="VarRange">
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>10.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4">
+     <widget class="QPushButton" name="Go">
+      <property name="text">
+       <string>Go</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="13">
+     <widget class="QDoubleSpinBox" name="VTLRange">
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>10.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3">
+     <widget class="QPushButton" name="ReportButton">
+      <property name="text">
+       <string>Generate Report</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QPushButton" name="PlayBack">
+      <property name="text">
+       <string>Playback Recording</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QPushButton" name="LoadData">
+      <property name="text">
+       <string>Load Existing Data</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="11" colspan="4">
+     <widget class="MatplotlibWidget" name="VocalTractPlot"/>
+    </item>
+    <item row="4" column="5">
+     <widget class="QPushButton" name="SaveFormants">
+      <property name="text">
+       <string>Save Formants</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="13">
+     <widget class="QDoubleSpinBox" name="VTLTarget">
+      <property name="maximum">
+       <double>25.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>15.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="6" colspan="3">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Range (%)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="8" rowspan="2" colspan="2">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Target Fundemental
+Frequency (Hz)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="9">
+     <widget class="QDoubleSpinBox" name="F0Range">
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>10.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="12" rowspan="2" colspan="2">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Target Vocal 
+Tract Length (cm)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1" rowspan="3" colspan="6">
+     <widget class="MatplotlibWidget" name="FormantPlot"/>
+    </item>
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout_2"/>
+    </item>
+    <item row="7" column="7" rowspan="3" colspan="12">
+     <widget class="MatplotlibWidget" name="PSDPlot"/>
+    </item>
+    <item row="7" column="18">
+     <widget class="QPushButton" name="PlotSwitch">
+      <property name="text">
+       <string>Switch Mode</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="9">
+     <widget class="QDoubleSpinBox" name="PitchTarget">
+      <property name="maximum">
+       <double>500.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>100.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1046</width>
+     <width>909</width>
      <height>26</height>
     </rect>
    </property>

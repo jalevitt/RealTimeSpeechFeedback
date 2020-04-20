@@ -3,6 +3,8 @@
 Created on Mon Mar 23 10:41:12 2020
 
 @author: Josh Levitt
+
+This file defines the behavior of the Developer mode of the UI
 """
 
 import sys
@@ -106,7 +108,7 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         self.VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+        self.VarAx.set_ylabel('F0 Variability (Semitones)')
         self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 0.8))
         
@@ -352,6 +354,7 @@ class Main(QtGui.QMainWindow):
                     self.f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     self.f0ax.set_ylim((0, 500))
                     self.f0ax.set_xlim((0, 0.8))
+                    self.ui.FundamentalFrequenncyPlot.draw()
                     
                     # get f0 from last 10 seconds for f0 variance
                     RecentPitches = []
@@ -383,7 +386,7 @@ class Main(QtGui.QMainWindow):
                     self.VarAx.hold(True)
                     self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
                     self.VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
-                    self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    self.VarAx.set_ylabel('F0 Variability (Semitones)')
                     self.VarAx.set_ylim((0, 25))
                     self.VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
@@ -602,7 +605,14 @@ class Main(QtGui.QMainWindow):
         root.destroy()
         return True
         
+        # callback for playing old data. See _Go for detailed comments.
     def _Playback(self): # similar to Go, but uses data from Load instead of collecting new data
+        
+        # make sure we actually have some data loaded
+        if np.sum(self.ui.Recording) == 0:
+            print('No data loaded, or loaded data is empty. Aborting playback')
+            return False
+            
         self.ui.Status = True        
         self.ui.Rect = None
         self.ui.Drag = None
@@ -689,7 +699,7 @@ class Main(QtGui.QMainWindow):
             while t < numSamples - chunkSize and self.ui.Status:
                 t += chunkSize
                 data = PyAudioTest.getChunk(chunkSize, audioStream, Random = 0)
-                data = self.ui.Recording[t - chunkSize:t]
+                data = self.ui.Recording[t - chunkSize:t] # replace the data with data from the old recording
                 data_ds = data[0:chunkSize:ds_rate] 
                 
                 # use yin implementation
@@ -756,7 +766,7 @@ class Main(QtGui.QMainWindow):
                     self.VarAx.hold(True)
                     self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
                     self.VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
-                    self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    self.VarAx.set_ylabel('F0 Variability (Semitones)')
                     self.VarAx.set_ylim((0, 25))
                     self.VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
@@ -923,11 +933,12 @@ class Main(QtGui.QMainWindow):
         print('elapsed time is:')
         print(ti.time() - start)
     
+    # callback for the axes dragger
     def DragArea(self, eclick, erelease):
         # re-initialize the dragger widget.
         self.ui.Drag = RectSelector.RectangleAxesDragger(self.ax, self.DragArea,
                                        useblit=False,
-                                       button=[3],  # left click only
+                                       button=[3],  # right click only
                                        minspanx=0.5, minspany=0,
                                        spancoords='pixels', parent = self)
         
@@ -1000,13 +1011,13 @@ class Main(QtGui.QMainWindow):
                 self.VarAx.hold(True)
                 self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
                 self.VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
-                self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                self.VarAx.set_ylabel('F0 Variability (Semitones)')
                 self.VarAx.set_ylim((0, 25))
                 self.VarAx.set_xlim((0.0, 0.8))
                 self.ui.PitchVar.draw()
             else:
                 self.VarAx.clear()
-                self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                self.VarAx.set_ylabel('F0 Variability (Semitones)')
                 self.VarAx.set_ylim((0, 25))
                 self.VarAx.set_xlim((0.0, 0.8))
                 self.ui.PitchVar.draw()
