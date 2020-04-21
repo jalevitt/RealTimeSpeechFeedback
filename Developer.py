@@ -97,7 +97,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         self.tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-        self.tractAx.set_ylim((0, 25))
+        self.tractAx.set_ylim((10, 20))
         self.tractAx.set_xlim((0, 0.8))
         
         self.VarAx = self.ui.PitchVar.figure.add_subplot(111)
@@ -258,7 +258,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         self.tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-        self.tractAx.set_ylim((0, 25))
+        self.tractAx.set_ylim((10, 20))
         self.tractAx.set_xlim((0, 0.8))
         self.VarAx = self.ui.PitchVar.figure.add_subplot(111)
         self.VarAx.tick_params(
@@ -381,7 +381,7 @@ class Main(QtGui.QMainWindow):
                     
                     # make pitch variability bar graph
                     h = self.ui.VarTarget.value() * 0.01 * 0.5 *self.ui.VarRange.value() # width of target bar
-                    h_0 = 0.2 # widht of measurment bar
+                    h_0 = 0.07 # widht of measurment bar
                     self.VarAx.clear()
                     self.VarAx.hold(True)
                     self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
@@ -465,7 +465,7 @@ class Main(QtGui.QMainWindow):
                         self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
                         self.tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        self.tractAx.set_ylim((0, 25))
+                        self.tractAx.set_ylim((10, 20))
                         self.tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                             
@@ -657,7 +657,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         self.tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-        self.tractAx.set_ylim((0, 25))
+        self.tractAx.set_ylim((10, 20))
         self.tractAx.set_xlim((0, 0.8))
         self.VarAx = self.ui.PitchVar.figure.add_subplot(111)
         self.VarAx.tick_params(
@@ -836,13 +836,13 @@ class Main(QtGui.QMainWindow):
                             
                         meanTractLength = np.median(RecentTractLength)
                         h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
-                        h_0 = 0.2
+                        h_0 = 0.07
                         self.tractAx.clear()
                         self.tractAx.hold(True)
                         self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
                         self.tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        self.tractAx.set_ylim((0, 25))
+                        self.tractAx.set_ylim((10, 20))
                         self.tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                         
@@ -985,13 +985,13 @@ class Main(QtGui.QMainWindow):
             if len(SelectedVTL) > 0:
                 meanVTL = np.mean(SelectedVTL)
                 h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
-                h_0 = 0.2
+                h_0 = 0.07
                 self.tractAx.clear()
                 self.tractAx.hold(True)
                 self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
                 self.tractAx.bar([0], [2 * h_0], bottom = [meanVTL - h_0], color = 'black')
                 self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-                self.tractAx.set_ylim((0, 25))
+                self.tractAx.set_ylim((10, 20))
                 self.tractAx.set_xlim((0, 0.8))
                 self.ui.VocalTractPlot.draw()
             else:

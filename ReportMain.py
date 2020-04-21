@@ -3,6 +3,8 @@
 Created on Mon Mar 23 11:11:04 2020
 
 @author: Josh Levitt
+
+This file defines the behavior of the report window
 """
 
 from PyQt4 import QtCore, QtGui
@@ -28,7 +30,7 @@ class ReportWindow(QtGui.QDialog):
         # set some parameters
         self.Coords = (0, 0, 0, 0)
         maxPitchLag = 3
-        maxVTLLag = 5
+        maxVTLLag = 3
         maxVarLag = 10
         
         # build time abscisa 
@@ -81,8 +83,8 @@ class ReportWindow(QtGui.QDialog):
         self.f0ax.scatter(parent.ui.PitchTime, Pitch, color = 'black')
         self.f0ax.set_ylim((0, 500))
         self.f0ax.set_xlim((0, 1.0 * n/parent.ui.fs))
-        self.f0ax.set_title('Fundemental Frequency')
-        self.f0ax.set_ylabel('Fundemental Frequency (Hz)')
+        self.f0ax.set_title('Fundamental Frequency')
+        self.f0ax.set_ylabel('F0 Frequency (Hz)')
         self.f0ax.set_xlabel('Time (s)')
         self.ui.PitchPlot.show()
         
@@ -110,7 +112,7 @@ class ReportWindow(QtGui.QDialog):
         self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1] + parent.ui.Targets[:, 4], color = 'aqua', linestyle = 'dashed')
         self.VTLax.plot(parent.ui.Time, parent.ui.Targets[:, 1] - parent.ui.Targets[:, 4], color = 'aqua', linestyle = 'dashed')
         self.VTLax.scatter(parent.ui.FormantTime, VTL,  color = 'black')
-        self.VTLax.set_ylim((0, 25))
+        self.VTLax.set_ylim((10, 20))
         self.VTLax.set_xlim((0, 1.0 * n/parent.ui.fs))
         self.VTLax.set_title('Vocal Tract Length')
         self.VTLax.set_ylabel('Vocal Tract Length (cm)')
@@ -143,7 +145,7 @@ class ReportWindow(QtGui.QDialog):
         self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 1.0 * n/parent.ui.fs))
         self.VarAx.set_title('F0 Variability')
-        self.VarAx.set_ylabel('Fundemental Frequency Variability (st)')
+        self.VarAx.set_ylabel('F0 Variability (st)')
         self.VarAx.set_xlabel('Time (s)')
         self.ui.VarPlot.show()
         
@@ -155,7 +157,7 @@ class ReportWindow(QtGui.QDialog):
         # set text
         RecordingStats = """
  Duration:                   %05.1f seconds
- Mean Fundemental Frequency: %05.1f Hz
+ Mean Fundamental Frequency: %05.1f Hz
  Mean Vocal Tract Length:    %05.2f cm
  Mean F0 Variability:        %05.2f st        
         """ %(D, MP, MVTL, MPV)
@@ -212,7 +214,7 @@ class ReportWindow(QtGui.QDialog):
         RecordingStats = """
  Selected Time:             (%05.1f, %05.1f)
  Duration:                   %05.1f seconds
- Mean Fundemental Frequency: %05.1f Hz
+ Mean Fundamental Frequency: %05.1f Hz
  Mean Vocal Tract Length:    %05.2f cm
  Mean F0 Variability:        %05.2f st        
         """ %(tMin, tMax, D, MP, MVTL, MPV)

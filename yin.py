@@ -120,8 +120,11 @@ def cumulativeMeanNormalizedDifferenceFunction(df, N):
     return np.insert(cmndf, 0, 1)
 
 
-
-def getPitch(cmdf, tau_min, tau_max, harmo_th=0.1, method = 'Josh'):
+# Josh's note: This is the only function from the package that I modified from its original form. 
+# It now has 3 modes of operation, 'highest', 'yin', and 'lowest', with lowest being the default.
+# 'highest' was the method as it was origially created, 'yin' is the most faithful adaptation of the 
+# Yin algorithm, but 'lowest'seems to perform best, at least with my voice. may require further testing
+def getPitch(cmdf, tau_min, tau_max, harmo_th=0.35, method = 'lowest'):
     """
     Return fundamental period of a frame based on CMND function.
 
@@ -132,15 +135,23 @@ def getPitch(cmdf, tau_min, tau_max, harmo_th=0.1, method = 'Josh'):
     :return: fundamental period if there is values under threshold, 0 otherwise
     :rtype: float
     """
-    if method == 'Josh':
+    
+    tau_max = np.min((tau_max, len(cmdf) - 1)) # line I added to avoid array out of bound errors
+    
+    if method == 'yin': # this is the implementation I wrote to correct for some problems I 
+        # found with the original implementation. It is the most accurate representation of Yin.
         c = cmdf[tau_min:tau_max]
         tau = np.argmin(c)
-        if c[tau] > harmo_th:
+        if c[tau] > harmo_th: # if no threshold crossings, the frame is unvoiced, return 0
             return 0
         else:
             return tau + tau_min
     
-    else:
+    elif method == 'highest': # This was the implementation in the code as I originally downloaded it.
+        # the problem is that it tends to choose the lowest value of tau that crosses the threshold,
+        # (or a similar value). This produces a bias toward higher f0. What we really want is the value 
+        # of tau that produces the minimum cmdf, as long as it crosses the threshold.
+        # The difference is subtle but important.
         tau = tau_min
         while tau < tau_max:
             if cmdf[tau] < harmo_th:
@@ -150,9 +161,25 @@ def getPitch(cmdf, tau_min, tau_max, harmo_th=0.1, method = 'Josh'):
             tau += 1
     
         return 0    # if unvoiced
+        
+    elif method == 'lowest': # This implementationis basically the opposite of highest, the original.
+        # It looks for the lowest frequency (highest tau) threshold crossing event
+        tau = tau_max
+        while tau > tau_min:
+            if cmdf[tau] < harmo_th:
+                while tau - 1 > tau_min and cmdf[tau - 1] < cmdf[tau]:
+                    tau -= 1
+                return tau
+            tau -= 1
+    
+        return 0    # if unvoiced
+    
+    
+    else:
+        return 0
 
 
-
+# I haven't really needed to use these functions, I don't think they would work well in real time.
 def compute_yin(sig, sr, dataFileName=None, w_len=512, w_step=256, f0_min=100, f0_max=500, harmo_thresh=0.1):
     """
 

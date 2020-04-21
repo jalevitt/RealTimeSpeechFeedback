@@ -1,0 +1,71 @@
+This document serves as a reference of parameter values that I determined on an ad-hoc basis,
+and should probably have rigorous testing put into them. I believe the values I chose are reasonable,
+but this is based on limited testing, using mostly my own voice.
+
+harmo_th: This variable sets the threshold below which f0 will be detected, for the purposes
+		of the Yin algorithm. The current value is 0.35. higher values will result in more
+		chunks being classified as voiced and potentially different f0 values, and lower 
+		values will result in the opposite (more unvoiced, also different f0 values).
+		This variable is used in UserMain.py, Developer.py, and ReportMain.py
+
+method: this is an optional parameter for the function yin.getPitch(). the current default is 
+		'lowest', but other options are 'yin', and 'highest'. 'Yin' is the most faithful
+		adaptation of the yin algorithm, but 'lowest' performs bets on my voice.
+		The defualt is set in yin.py, but can de overriden in calls in UserMain.py, 
+		Developer.py, and ReportMain.py
+
+tau_min, tau_max: These are the max and min values, acting as bounds for pitch (tau) detection. their current values
+		depend upon fs, and area set to fs/500 and fs/75 respectively
+		These variables are used in UserMain.py, Developer.py, and ReportMain.py, but are not stored in a variable.
+		Instead, they are entered directly in the function call yin.getPitch() and yin.differenceFunction().
+
+maxPitchLag, maxVocalLag, maxPitchVarLag: These set the window sizes (in seconds) over which the mean of f0, VTL, and 
+		f0 variability are calculated. their current values are 3, 3, and 10, respectively. Larger values will
+		make the means smoother, but less responsive. lower values will do the opposite.
+		they are used in UserMain.py, Developer.py and used by different names in ReportMain.py
+
+ds_rate: This defines how much the recording is downsampled for the purpose of finding formants. note that the 
+		original non-downsampled version is used for pitch detection, and is what gets saved. current value is 3.
+		lower values (2 or 1) will increase fidelity, but also computation load, and some computers may not
+		be able to keep up with real time.
+		Used in UserMain.py, and Developer.py
+
+LPC Parameters: there are a number of choices I made in the function FormantFinder.findFormantsLPC() which could be fine tuned.
+		Most don't have specific variable names, but are apparent nonetheless:
+
+		windowing: I chose to using a hamming window, which seems sensible, but there are obviously other choices.
+
+		filtering: I used filter coefficients [1] and [1, 0.63], which come directly from the source of the code.
+				I haven't tried messing with this as it seems to work. you could try more complex filters,
+				but it would cause computational load problems.
+
+		order: LPC order is specified as 2 + fs / 1000. given fs = 44100 by default, this gives a value of 46. 
+				This comes directly from the source of the code, but is arguably on the high side.
+		
+		Restrictions: I set restrictions that formants had to be greater than 90Hz, and less than 5000Hz, 
+				with a bandwidth les than 500Hz. Again, these values are direct from the code source,
+				but they seem reasonable to me.
+
+		Also note that a maximum of 5 formants can actually be stored, although more can be detected in principle.
+
+VTL method: this is an optional parameter to the function FormantFinder.getVocalTractLength(). the default value is 'fd',
+		but is overriden in all cases to be 'lammert'. These represent 2 methods to estimate VTL from the formants
+		based on Lammert et al. 'fd' is for 'frequency dispersion', a method based on f1 and the highest available
+		formant, but 'lammert' is the method described by the paper.
+		the default is set in FormantFinder.py, but in practice is overridden in UserMain.py, Developer.py, and ReportMain.py
+
+chunkSize: this determines how many sample points are read at once, and how large the chunks used to calculate f0 and formants are.
+		The current value is 8192. it would be nice if it could stay a power of 2, as this is efficient for many algoritms.
+		this value works well for fs = 44100, but could be problematic for other sample rates. larger values will decrease the frame
+		rate of the app, and give it a more halting appearance. lower values may increase computational load. There's
+		a lot to consider for this value, for example larger values may include multiple phonemes, but really small values 
+		may be smaller than the fundamental period. I wouldn't reccomend going any higher, but going lower could be 
+		sensible if you have a good cpu. 
+		Used in UserMain.py, and Developer.py
+
+
+
+
+
+
+

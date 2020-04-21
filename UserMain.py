@@ -61,7 +61,7 @@ class Main(QtGui.QMainWindow):
         # set up axes labels etc        
         ax = self.ui.TwoD.figure.add_subplot(111)
         ax.set_title('Speech Targeting')
-        ax.set_xlabel('Fundemental Frequency (Hz)')
+        ax.set_xlabel('Fundamental Frequency (Hz)')
         ax.set_ylabel('Vocal Tract Length (cm)')
         f0ax = self.ui.FundamentalFrequenncyPlot.figure.add_subplot(111)
         f0ax.tick_params(
@@ -84,7 +84,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         tractAx.set_ylabel('Vocal Tract Length (cm)')
-        tractAx.set_ylim((0, 25))
+        tractAx.set_ylim((10, 20))
         tractAx.set_xlim((0, 0.8))
         
         VarAx = self.ui.PitchVar.figure.add_subplot(111)
@@ -191,7 +191,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         tractAx.set_ylabel('Vocal Tract Length (cm)')
-        tractAx.set_ylim((0, 25))
+        tractAx.set_ylim((10, 20))
         tractAx.set_xlim((0, 0.8))
         VarAx = self.ui.PitchVar.figure.add_subplot(111)
         VarAx.tick_params(
@@ -342,13 +342,13 @@ class Main(QtGui.QMainWindow):
                             
                         meanTractLength = np.median(RecentTractLength)
                         h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
-                        h_0 = 0.2
+                        h_0 = 0.07
                         tractAx.clear()
                         tractAx.hold(True)
                         tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
                         tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        tractAx.set_ylim((0, 25))
+                        tractAx.set_ylim((10, 20))
                         tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                             
@@ -374,10 +374,10 @@ class Main(QtGui.QMainWindow):
                 ax.scatter([meanPitch], [meanTractLength], color = C)
                 #ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
                 ax.set_title('Speech Targeting')
-                ax.set_xlabel('Fundemental Frequency (Hz)')
+                ax.set_xlabel('Fundamental Frequency (Hz)')
                 ax.set_ylabel('Vocal Tract Length (cm)')
                 ax.set_xlim((0, 500))
-                ax.set_ylim((0, 25))
+                ax.set_ylim((10, 20))
                 self.ui.TwoD.draw()
                 
                 #keep track of our target values, in case they chane over time
@@ -514,7 +514,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         tractAx.set_ylabel('Vocal Tract Length (cm)')
-        tractAx.set_ylim((0, 25))
+        tractAx.set_ylim((10, 20))
         tractAx.set_xlim((0, 0.8))
         VarAx = self.ui.PitchVar.figure.add_subplot(111)
         VarAx.tick_params(
@@ -650,13 +650,13 @@ class Main(QtGui.QMainWindow):
                             
                         meanTractLength = np.median(RecentTractLength)
                         h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
-                        h_0 = 0.2
+                        h_0 = 0.07
                         tractAx.clear()
                         tractAx.hold(True)
                         tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
                         tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        tractAx.set_ylim((0, 25))
+                        tractAx.set_ylim((10, 20))
                         tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                             
@@ -685,10 +685,10 @@ class Main(QtGui.QMainWindow):
                 
                 #ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
                 ax.set_title('Speech Targeting')
-                ax.set_xlabel('Fundemental Frequency (Hz)')
+                ax.set_xlabel('Fundamental Frequency (Hz)')
                 ax.set_ylabel('Vocal Tract Length (cm)')
                 ax.set_xlim((0, 500))
-                ax.set_ylim((0, 25))
+                ax.set_ylim((10, 20))
                 self.ui.TwoD.draw()
                 
                 if Count >= len(self.ui.Time):
