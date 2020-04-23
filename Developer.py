@@ -3,6 +3,8 @@
 Created on Mon Mar 23 10:41:12 2020
 
 @author: Josh Levitt
+
+This file defines the behavior of the Developer mode of the UI
 """
 
 import sys
@@ -27,7 +29,7 @@ import DeveloperUI
 import UserMain
 import RectSelector
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore") # warnings are for wimps.
 
 class Main(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -49,6 +51,7 @@ class Main(QtGui.QMainWindow):
         self.ui.ReportButton.clicked.connect(self._MakeReport)
         self.ui.UserMode.clicked.connect(self._LaunchUserMode)
         self.ui.PlotSpectrogram.clicked.connect(self._AddSpec)
+        self.ui.PlotSwitch.clicked.connect(self._SwitchPlot)
         
         # set up some vriables
         self.ui.Recording = np.zeros(100000, dtype = np.int16)
@@ -60,6 +63,7 @@ class Main(QtGui.QMainWindow):
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
         self.ui.Time = np.zeros(1000, dtype = np.float32)
         self.ui.Targets = np.zeros((1000, 3), dtype = np.float32)
+        self.ui.PlotStatus = "Formants"
         
         # set up axes labels etc        
         self.ax = self.ui.RawPlot.figure.add_subplot(111)
@@ -93,7 +97,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         self.tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-        self.tractAx.set_ylim((0, 25))
+        self.tractAx.set_ylim((10, 20))
         self.tractAx.set_xlim((0, 0.8))
         
         self.VarAx = self.ui.PitchVar.figure.add_subplot(111)
@@ -104,7 +108,7 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         self.VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+        self.VarAx.set_ylabel('F0 Variability (Semitones)')
         self.VarAx.set_ylim((0, 25))
         self.VarAx.set_xlim((0, 0.8))
         
@@ -114,15 +118,26 @@ class Main(QtGui.QMainWindow):
         self.FormantAx.set_ylabel('Frequency (Hz)')
         self.FormantAx.set_xlabel('Time (s)')
         self.FormantAx.set_ylim((0, 5000))
+    
+    # callback for switching the display from PSD (formants) to autocorrelation (F0)
+    def _SwitchPlot(self):
+        if self.ui.PlotStatus == "Formants":
+            self.ui.PlotStatus = "F0"
+        else:
+            self.ui.PlotStatus = "Formants"
+
+        print(self.ui.PlotStatus)
+        return self.ui.PlotStatus
         
+    # callback to add spectrogram to formants plot (only works if recording is stopped)
     def _AddSpec(self):
         if not self.ui.Status: #make sure the recording isn't running first
             FormantScatterColors = ['black', 'dimgrey', 'darkgray', 'silver', 'gainsboro', 'whitesmoke']
             self.FormantAx.clear()        # clear the axes
             self.FormantAx.hold(True)
             # make the spectrogram
-            spec, f, t, im = self.FormantAx.specgram(self.ui.Recording, NFFT = 2 ** 14, 
-                                                     Fs = self.ui.fs, noverlap = 2 ** 13)
+            spec, f, t, im = self.FormantAx.specgram(self.ui.Recording, NFFT = 2 ** 8, 
+                                                     Fs = self.ui.fs, noverlap = 2 ** 7)
             # add our formant dots
             for i in range(len(self.ui.FormantTime)):
                 for f in range(5):
@@ -136,20 +151,22 @@ class Main(QtGui.QMainWindow):
             self.FormantAx.set_xlabel('Time (s)')
             self.ui.FormantPlot.draw()
             
-        
+    # callback to switch from developer mode to user mode 
     def _LaunchUserMode(self):
         UserMain.Main(parent = self).show()
-        
+    
+    # callback to open the report window
     def _MakeReport(self):
         print('Generating Report...')
         ReportMain.ReportWindow(self).show()
         
         
-        
+    # callback to stop the recording 
     def _StopRun(self):
         #stop recording/playback
         self.ui.Status = False
         
+    # callback to save formants to CSV
     def _SaveF(self): 
         # save formants
         root = Tk()
@@ -168,7 +185,8 @@ class Main(QtGui.QMainWindow):
         print('Formant CSV save successful')
         root.destroy()
         return True
-        
+     
+    # callback to save F0 to CSV
     def _SaveP(self):
         #save Pitch
         root = Tk()
@@ -188,6 +206,7 @@ class Main(QtGui.QMainWindow):
         root.destroy()
         return True
         
+    # callback to start a recording
     def _GoRun(self): #main button callback for collecting new data
         self.ui.Status = True
         self.ui.fs = 44100 #set sample rate, default to 44100
@@ -196,7 +215,7 @@ class Main(QtGui.QMainWindow):
         iters = 1000 # (mostly) deprecated
         chunkSize = 8192 #number of samples to read in at once
         numSamples = iters * chunkSize # sets an initial size for our recording buffer
-        windowSize = 5
+        windowSize = 5 # width of our raw data plot in seconds
         
         #set up an audio stream
         p = pyaudio.PyAudio()
@@ -209,6 +228,7 @@ class Main(QtGui.QMainWindow):
         self.ui.FormantTime = np.zeros(100, dtype = np.float32)
         self.ui.Pitch = np.zeros(100, dtype = np.float32)
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
+        self.ui.Targets = np.zeros((1000, 6), dtype = np.float32)
         FormantCount = 0
         PitchCount = 0
         
@@ -238,7 +258,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         self.tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-        self.tractAx.set_ylim((0, 25))
+        self.tractAx.set_ylim((10, 20))
         self.tractAx.set_xlim((0, 0.8))
         self.VarAx = self.ui.PitchVar.figure.add_subplot(111)
         self.VarAx.tick_params(
@@ -263,7 +283,7 @@ class Main(QtGui.QMainWindow):
         maxVocalLag = 3 #winodw size for calculating VTL in sec
         maxPitchVarLag = 10 #window size for calculating pitch var in sec
         
-        FormantScatterColors = ['black', 'dimgrey', 'darkgray', 'silver', 'gainsboro', 'whitesmoke']
+        FormantScatterColors = ['black', 'dimgrey', 'darkgray', 'silver', 'gainsboro', 'whitesmoke']#dot colors for formant scatter plot
         #initialize vars
         meanPitch = 0
         meanTractLength = 0
@@ -296,20 +316,22 @@ class Main(QtGui.QMainWindow):
                 self.ui.Recording[i * chunkSize:(i + 1) * chunkSize] = data
                 
                 # get f0 and update f0 plot                
-                # use yin implementation instead
+                # use yin implementation
                 # yin's original implementation called for filtering, 
                 # which we have not yet implemented for computational reasons
                 data_hamming = data * np.hamming(chunkSize)
                 df = yin.differenceFunction(data_hamming, chunkSize, self.ui.fs/75)
                 cmndf = yin.cumulativeMeanNormalizedDifferenceFunction(df, len(df))
-                f0 = yin.getPitch(cmndf, self.ui.fs/500, self.ui.fs/75, harmo_th = 0.35)
+                f0 = yin.getPitch(cmndf, self.ui.fs/500, self.ui.fs/75, harmo_th = 0.35) # the value returned is in pitch period samples, not hz
                 
-                if f0: # if f0 is detected, update our graph
-                    # store ot pitch and time
-                    self.ui.Pitch[PitchCount] = 1.0 * self.ui.fs/f0
+                if f0: # if f0 is detected, we have work to do
+                    
+                    f0 = 1.0 * self.ui.fs/f0 # convert from tau to Hz
+                    # store our pitch and time
+                    self.ui.Pitch[PitchCount] = f0
                     self.ui.PitchTime[PitchCount] = 1.0 * (t - chunkSize / 2) / self.ui.fs
                     PitchCount += 1
-                    # add space if needed
+                    # add space if needed so we don't get array out of bounds error
                     if PitchCount >= len(self.ui.PitchTime):
                         self.ui.Pitch = np.concatenate((self.ui.Pitch, np.zeros(200, dtype = np.float32)))
                         self.ui.PitchTime = np.concatenate((self.ui.PitchTime, np.zeros(200, dtype = np.float32)))
@@ -321,17 +343,20 @@ class Main(QtGui.QMainWindow):
                         RecentPitches.append(self.ui.Pitch[pitchIDX])
                         pitchIDX -= 1
                         
+                    #update f0 bar graph
                     meanPitch = np.mean(RecentPitches)
-                    h = 2.0
+                    h = self.ui.PitchTarget.value() * 0.01 * 0.5 *self.ui.F0Range.value() # width of target bar
+                    h_0 = 3 # width of measurment bar
                     self.f0ax.clear()
                     self.f0ax.hold(True)
-                    self.f0ax.bar([0], [2.0 * h], bottom = [meanPitch - h])
-                    self.f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'black')
+                    self.f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'aqua')
+                    self.f0ax.bar([0], [2.0 * h_0], bottom = [meanPitch - h_0], color = 'black')
                     self.f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     self.f0ax.set_ylim((0, 500))
                     self.f0ax.set_xlim((0, 0.8))
                     self.ui.FundamentalFrequenncyPlot.draw()
-                                        
+                    
+                    # get f0 from last 10 seconds for f0 variance
                     RecentPitches = []
                     pitchIDX = PitchCount - 1
                     while self.ui.PitchTime[pitchIDX] >= 1.0 * (t - chunkSize / 2) / self.ui.fs - maxPitchVarLag and pitchIDX >= 0:
@@ -355,23 +380,42 @@ class Main(QtGui.QMainWindow):
                         STVarPitch = 0
                     
                     # make pitch variability bar graph
-                    h = 0.1
+                    h = self.ui.VarTarget.value() * 0.01 * 0.5 *self.ui.VarRange.value() # width of target bar
+                    h_0 = 0.07 # widht of measurment bar
                     self.VarAx.clear()
                     self.VarAx.hold(True)
-                    self.VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
-                    self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                    self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
+                    self.VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
+                    self.VarAx.set_ylabel('F0 Variability (Semitones)')
                     self.VarAx.set_ylim((0, 25))
                     self.VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
                     
-                
-                self.PSDax.clear()
-                self.PSDax.hold(True)
-                if f0:
-                    try:
-                        fBins, PSD = sp.signal.periodogram(data_ds, self.ui.fs / ds_rate)
-                        PSD = 20 * np.log10(PSD)
+                    if self.ui.PlotStatus == 'F0': # make the autocorrelation graph if we're in F0 mode
+                        self.PSDax.clear()
+                        self.PSDax.hold(True)
+                        x_cmndf = 1.0 * np.array(range(len(cmndf)))
+                        x_cmndf = (1.0 * self.ui.fs) / x_cmndf # make abscissa, convert to Hz
+                        self.PSDax.plot(x_cmndf, cmndf) # plot difference function
+                        self.PSDax.plot([f0, f0], [0, 3], color = 'red') # plot vertical line for F0
+                        self.PSDax.plot([0, 500], [0.35, 0.35], color = 'black') # plot horizontal line for threshold
+                        self.PSDax.set_title('Mean-normalized Difference Function')
+                        self.PSDax.set_xlabel('Frequency (Hz)')
+                        self.PSDax.set_ylabel('Mean-normalized Difference')
+                        self.PSDax.set_ylim((0, 3))
+                        self.PSDax.set_xlim((0, 500))
+                        self.ui.PSDPlot.draw()
+                        self.PSDax.hold(False)
+                    
+                if self.ui.PlotStatus == 'Formants':
+                    self.PSDax.clear()
+                    self.PSDax.hold(True)
+                if f0: # if we have F0, look for formants
+                    try: # this is in a try block because formant finding can throw errors
+                        if self.ui.PlotStatus == 'Formants': # if we're in formants mode, calculate PSD
+                            fBins, PSD = sp.signal.periodogram(data_ds, self.ui.fs / ds_rate)
+                            PSD = 20 * np.log10(PSD) # convert to dB
+                            
                         Formants = FormantFinder.findFormantsLPC(data_ds, self.ui.fs / ds_rate)
                                                 
                         #store Formants
@@ -381,22 +425,24 @@ class Main(QtGui.QMainWindow):
                             self.ui.Formants[FormantCount, 0:len(Formants)] = Formants
                         self.ui.FormantTime[FormantCount] = 1.0 * (t - chunkSize / 2) / self.ui.fs
                         
-                        for f in range(len(Formants)): # plot the formants as  vertical lines
-                            self.PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
+                        for f in range(len(Formants)): 
+                            if self.ui.PlotStatus == 'Formants':
+                                self.PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')# plot the formants as  vertical lines
                             # plot formants as scatter points
                             self.FormantAx.scatter(self.ui.FormantTime[FormantCount], Formants[f], color = FormantScatterColors[f])
                             
-                        self.PSDax.plot(fBins, PSD)
-                        self.PSDax.set_title('Power Spectrum - Formants')
-                        self.PSDax.set_xlabel('Frequency (Hz)')
-                        self.PSDax.set_ylabel('Power (dB)')
-                        self.PSDax.set_ylim((-90, 90))
-                        self.PSDax.set_xlim((0, 5000))
-                        self.ui.PSDPlot.draw()
-                        self.PSDax.hold(False)                        
+                        if self.ui.PlotStatus == 'Formants':  # if we're in formant mode, update our graph  
+                            self.PSDax.plot(fBins, PSD)
+                            self.PSDax.set_title('Power Spectrum - Formants')
+                            self.PSDax.set_xlabel('Frequency (Hz)')
+                            self.PSDax.set_ylabel('Power (dB)')
+                            self.PSDax.set_ylim((-90, 90))
+                            self.PSDax.set_xlim((0, 5000))
+                            self.ui.PSDPlot.draw()
+                            self.PSDax.hold(False)                        
                         
                         FormantCount += 1
-                        # add space if needed
+                        # add space if needed to prevent array out of bounds
                         if FormantCount >= len(self.ui.FormantTime):
                             self.ui.Formants = np.concatenate((self.ui.Formants, np.zeros((200, 5), dtype = np.float32)))
                             self.ui.FormantTime = np.concatenate((self.ui.FormantTime, np.zeros(200, dtype = np.float32)))
@@ -410,15 +456,16 @@ class Main(QtGui.QMainWindow):
                                 RecentTractLength.append(vtl)
                             tractIDX -= 1
                             
+                        # update VTL bar graph
                         meanTractLength = np.median(RecentTractLength)
-                        h = 0.1
+                        h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value() #width for target bar
+                        h_0 = 0.2 # width for measurment bar
                         self.tractAx.clear()
                         self.tractAx.hold(True)
-                        self.tractAx.bar([0], [2 * h], bottom = [meanTractLength - h])
-                        self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'black')
-                        
+                        self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
+                        self.tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        self.tractAx.set_ylim((0, 25))
+                        self.tractAx.set_ylim((10, 20))
                         self.tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                             
@@ -434,36 +481,39 @@ class Main(QtGui.QMainWindow):
                     self.ax.set_xlabel('Time (s)')
                     self.ax.set_ylabel('amplitude')
                     self.ui.RawPlot.draw()
-                    self.FormantAx.set_ylabel('Frequency (Hz)')
+                    self.FormantAx.set_ylabel('Frequency (Hz)') # also update our formant scatter plot
                     self.FormantAx.set_xlabel('Time (s)')
                     self.FormantAx.set_ylim((0, 5000))
                     self.FormantAx.set_xlim((t/self.ui.fs - windowSize, t/self.ui.fs + 1))
                     self.ui.FormantPlot.draw()
                     
                     
-                #keep track of our target values, in case they chane over time
-                if i >= len(self.ui.Time): # add extra space to vectors in case we need it
+                #keep track of our target values, in case they chane over time, and also our target ranges
+                if i >= len(self.ui.Time): # add extra space to vectors in case we need it to prevent array out of bounds
                     self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
-                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 3), dtype = np.float32)))
+                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 6), dtype = np.float32)))
                     
                 self.ui.Time[i] = 1.0 * t / self.ui.fs
                 self.ui.Targets[i, 0] = self.ui.PitchTarget.value() 
                 self.ui.Targets[i, 1] = self.ui.VTLTarget.value()
-                self.ui.Targets[i, 2] =self.ui.VarTarget.value()
+                self.ui.Targets[i, 2] = self.ui.VarTarget.value()
+                self.ui.Targets[i, 3] = self.ui.PitchTarget.value() * 0.01 * 0.5 * self.ui.F0Range.value()
+                self.ui.Targets[i, 4] = self.ui.VTLTarget.value() * 0.01 * 0.5 * self.ui.VTLRange.value()
+                self.ui.Targets[i, 5] = self.ui.VarTarget.value() * 0.01 * 0.5 * self.ui.VarRange.value()
                 i += 1
                 
                 #check for incoming button clicks i.e. stop button
                 QtCore.QCoreApplication.processEvents()
 
         except (KeyboardInterrupt, SystemExit): # in case of a keyboard interrupt or system exit, clean house
-            self.ui.Rect = RectSelector.PersistRectangleSelector(self.ax, self.SelectArea,
+            self.ui.Rect = RectSelector.PersistRectangleSelector(self.ax, self.SelectArea, # widget for selecting areas
                                        drawtype='box', useblit=False,
                                        button=[1],  # left click only
                                        minspanx=0.1, minspany=0,
                                        spancoords='pixels')
-            self.ui.Drag = RectSelector.RectangleAxesDragger(self.ax, self.DragArea,
+            self.ui.Drag = RectSelector.RectangleAxesDragger(self.ax, self.DragArea, # widget for dragging axes
                                        useblit=False,
-                                       button=[3],  # left click only
+                                       button=[3],  # right click only
                                        minspanx=0.5, minspany=0,
                                        spancoords='pixels', parent = self)
             self.ui.RawPlot.draw()
@@ -483,8 +533,8 @@ class Main(QtGui.QMainWindow):
             print('elapsed time is:')
             print(ti.time() - start)
             return True            
-        #truncate zero pads
-            
+        
+        # clean up at the end of a recording
         self.ui.Rect = RectSelector.PersistRectangleSelector(self.ax, self.SelectArea,
                                        drawtype='box', useblit=False,
                                        button=[1],  # left click only
@@ -495,6 +545,7 @@ class Main(QtGui.QMainWindow):
                                        button=[3],  # left click only
                                        minspanx=0.5, minspany=0,
                                        spancoords='pixels', parent = self)
+        #truncate zero pads
         self.ui.RawPlot.draw()
         self.ui.Pitch = self.ui.Pitch[0:PitchCount]
         self.ui.PitchTime = self.ui.PitchTime[0:PitchCount]
@@ -511,6 +562,7 @@ class Main(QtGui.QMainWindow):
         print(ti.time() - start)
         return True
         
+    # callback to save recording as .wav
     def _SaveRecording(self): 
         # open a save dialog so the user can select a file name
         root = Tk()
@@ -532,7 +584,7 @@ class Main(QtGui.QMainWindow):
         print('Save Successful')
         return True
             
-            
+     # callback to load an existing .wav      
     def _Load(self):
         # open file finder dialog UI
         root = Tk()
@@ -553,7 +605,14 @@ class Main(QtGui.QMainWindow):
         root.destroy()
         return True
         
+        # callback for playing old data. See _Go for detailed comments.
     def _Playback(self): # similar to Go, but uses data from Load instead of collecting new data
+        
+        # make sure we actually have some data loaded
+        if np.sum(self.ui.Recording) == 0:
+            print('No data loaded, or loaded data is empty. Aborting playback')
+            return False
+            
         self.ui.Status = True        
         self.ui.Rect = None
         self.ui.Drag = None
@@ -568,6 +627,7 @@ class Main(QtGui.QMainWindow):
         self.ui.FormantTime = np.zeros(100, dtype = np.float32)
         self.ui.Pitch = np.zeros(100, dtype = np.float32)
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
+        self.ui.Targets = np.zeros((1000, 6), dtype = np.float32)
         PitchCount = 0
         FormantCount = 0
         
@@ -597,7 +657,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         self.tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-        self.tractAx.set_ylim((0, 25))
+        self.tractAx.set_ylim((10, 20))
         self.tractAx.set_xlim((0, 0.8))
         self.VarAx = self.ui.PitchVar.figure.add_subplot(111)
         self.VarAx.tick_params(
@@ -639,7 +699,7 @@ class Main(QtGui.QMainWindow):
             while t < numSamples - chunkSize and self.ui.Status:
                 t += chunkSize
                 data = PyAudioTest.getChunk(chunkSize, audioStream, Random = 0)
-                data = self.ui.Recording[t - chunkSize:t]
+                data = self.ui.Recording[t - chunkSize:t] # replace the data with data from the old recording
                 data_ds = data[0:chunkSize:ds_rate] 
                 
                 # use yin implementation
@@ -649,8 +709,9 @@ class Main(QtGui.QMainWindow):
                 f0 = yin.getPitch(cmndf, self.ui.fs/500, self.ui.fs/75, harmo_th = 0.35)
                 
                 if f0:
+                    f0 = 1.0 * self.ui.fs/f0 # convert from tau to Hz
                     # store ot pitch and time
-                    self.ui.Pitch[PitchCount] = 1.0 * self.ui.fs/f0
+                    self.ui.Pitch[PitchCount] = f0
                     self.ui.PitchTime[PitchCount] = 1.0 * (t - chunkSize / 2) / self.ui.fs
                     PitchCount += 1
                     # add space if needed
@@ -665,11 +726,12 @@ class Main(QtGui.QMainWindow):
                         pitchIDX -= 1
                         
                     meanPitch = np.mean(RecentPitches)
-                    h = 2.0
+                    h = self.ui.PitchTarget.value() * 0.01 * 0.5 *self.ui.F0Range.value()
+                    h_0 = 3
                     self.f0ax.clear()
                     self.f0ax.hold(True)
-                    self.f0ax.bar([0], [2.0 * h], bottom = [meanPitch - h])
-                    self.f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'black')
+                    self.f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'aqua')
+                    self.f0ax.bar([0], [2.0 * h_0], bottom = [meanPitch - h_0], color = 'black')
                     self.f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     self.f0ax.set_ylim((0, 500))
                     self.f0ax.set_xlim((0, 0.8))
@@ -698,23 +760,41 @@ class Main(QtGui.QMainWindow):
                     else:
                         STVarPitch = 0
                         
-                    h = 0.1
+                    h = self.ui.VarTarget.value() * 0.01 * 0.5 *self.ui.VarRange.value()
+                    h_0 = 0.2
                     self.VarAx.clear()
                     self.VarAx.hold(True)
-                    self.VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
-                    self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                    self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
+                    self.VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
+                    self.VarAx.set_ylabel('F0 Variability (Semitones)')
                     self.VarAx.set_ylim((0, 25))
                     self.VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
                     
-                
-                self.PSDax.clear()
-                self.PSDax.hold(True)
+                    if self.ui.PlotStatus == 'F0':
+                        self.PSDax.clear()
+                        self.PSDax.hold(True)
+                        x_cmndf = 1.0 * np.array(range(len(cmndf)))
+                        x_cmndf = (1.0 * self.ui.fs) / x_cmndf
+                        self.PSDax.plot(x_cmndf, cmndf)
+                        self.PSDax.plot([f0, f0], [0, 3], color = 'red')
+                        self.PSDax.plot([0, 500], [0.35, 0.35], color = 'black')
+                        self.PSDax.set_title('Mean-normalized Difference Function')
+                        self.PSDax.set_xlabel('Frequency (Hz)')
+                        self.PSDax.set_ylabel('Mean-normalized Difference')
+                        self.PSDax.set_ylim((0, 3))
+                        self.PSDax.set_xlim((0, 500))
+                        self.ui.PSDPlot.draw()
+                        self.PSDax.hold(False)
+                          
+                if self.ui.PlotStatus == 'Formants':
+                    self.PSDax.clear()
+                    self.PSDax.hold(True)
                 if f0:
                     try:
-                        fBins, PSD = sp.signal.periodogram(data_ds, self.ui.fs / ds_rate)
-                        PSD = 20 * np.log10(PSD)
+                        if self.ui.PlotStatus == 'Formants':
+                            fBins, PSD = sp.signal.periodogram(data_ds, self.ui.fs / ds_rate)
+                            PSD = 20 * np.log10(PSD)
                         Formants = FormantFinder.findFormantsLPC(data_ds, self.ui.fs / ds_rate)
                           
                         
@@ -726,17 +806,19 @@ class Main(QtGui.QMainWindow):
                         self.ui.FormantTime[FormantCount] = 1.0 * (t - chunkSize / 2) / self.ui.fs
                         
                         for f in range(len(Formants)): # plot the formants as  vertical lines
-                            self.PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
+                            if self.ui.PlotStatus == 'Formants':
+                                self.PSDax.plot([Formants[f], Formants[f]], [-100, 75], color = 'red')
                             self.FormantAx.scatter(self.ui.FormantTime[FormantCount], Formants[f], color = FormantScatterColors[f])
                             
-                        self.PSDax.plot(fBins, PSD)
-                        self.PSDax.set_title('Power Spectrum - Formants')
-                        self.PSDax.set_xlabel('Frequency (Hz)')
-                        self.PSDax.set_ylabel('Power (dB)')
-                        self.PSDax.set_ylim((-90, 90))
-                        self.PSDax.set_xlim((0, 5000))
-                        self.ui.PSDPlot.draw()
-                        self.PSDax.hold(False)
+                        if self.ui.PlotStatus == 'Formants':    
+                            self.PSDax.plot(fBins, PSD)
+                            self.PSDax.set_title('Power Spectrum - Formants')
+                            self.PSDax.set_xlabel('Frequency (Hz)')
+                            self.PSDax.set_ylabel('Power (dB)')
+                            self.PSDax.set_ylim((-90, 90))
+                            self.PSDax.set_xlim((0, 5000))
+                            self.ui.PSDPlot.draw()
+                            self.PSDax.hold(False)
                             
                         FormantCount += 1
                         # add space if needed
@@ -753,14 +835,14 @@ class Main(QtGui.QMainWindow):
                             tractIDX -= 1
                             
                         meanTractLength = np.median(RecentTractLength)
-                        h = 0.1
+                        h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
+                        h_0 = 0.07
                         self.tractAx.clear()
                         self.tractAx.hold(True)
-                        self.tractAx.bar([0], [2 * h], bottom = [meanTractLength - h])
-                        self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'black')
-                        
+                        self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
+                        self.tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        self.tractAx.set_ylim((0, 25))
+                        self.tractAx.set_ylim((10, 20))
                         self.tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                         
@@ -785,12 +867,15 @@ class Main(QtGui.QMainWindow):
                 
                 if Count >= len(self.ui.Time):
                     self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
-                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 3), dtype = np.float32)))
+                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 6), dtype = np.float32)))
                     
                 self.ui.Time[Count] = 1.0 * t / self.ui.fs
                 self.ui.Targets[Count, 0] = self.ui.PitchTarget.value() 
                 self.ui.Targets[Count, 1] = self.ui.VTLTarget.value()
                 self.ui.Targets[Count, 2] =self.ui.VarTarget.value()
+                self.ui.Targets[Count, 3] = self.ui.PitchTarget.value() * 0.01 * 0.5 * self.ui.F0Range.value()
+                self.ui.Targets[Count, 4] = self.ui.VTLTarget.value() * 0.01 * 0.5 * self.ui.VTLRange.value()
+                self.ui.Targets[Count, 5] = self.ui.VarTarget.value() * 0.01 * 0.5 * self.ui.VarRange.value()
                 
                 Count += 1    
                     
@@ -848,11 +933,12 @@ class Main(QtGui.QMainWindow):
         print('elapsed time is:')
         print(ti.time() - start)
     
+    # callback for the axes dragger
     def DragArea(self, eclick, erelease):
         # re-initialize the dragger widget.
         self.ui.Drag = RectSelector.RectangleAxesDragger(self.ax, self.DragArea,
                                        useblit=False,
-                                       button=[3],  # left click only
+                                       button=[3],  # right click only
                                        minspanx=0.5, minspany=0,
                                        spancoords='pixels', parent = self)
         
@@ -879,16 +965,16 @@ class Main(QtGui.QMainWindow):
                         SelectedVTL.append(vtl)
             # if at least one pitch is selected, update our mean pitch plot. otherwise, clear it.           
             if len(SelectedPitch) > 0:
-                h = 2.0
                 meanPitch = np.mean(SelectedPitch)
+                h = self.ui.PitchTarget.value() * 0.01 * 0.5 *self.ui.F0Range.value()
+                h_0 = 3
                 self.f0ax.clear()
                 self.f0ax.hold(True)
-                self.f0ax.bar([0], [2.0 * h], bottom = [meanPitch - h])
-                self.f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'black')
+                self.f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'aqua')
+                self.f0ax.bar([0], [2.0 * h_0], bottom = [meanPitch - h_0], color = 'black')
                 self.f0ax.set_ylabel('Fundamental Frequency (Hz)')
                 self.f0ax.set_ylim((0, 500))
                 self.f0ax.set_xlim((0, 0.8))
-                self.ui.FundamentalFrequenncyPlot.draw()
             else:
                 self.f0ax.clear()
                 self.f0ax.set_ylabel('Fundamental Frequency (Hz)')
@@ -897,14 +983,15 @@ class Main(QtGui.QMainWindow):
                 self.ui.FundamentalFrequenncyPlot.draw()
             # repeat for VTL
             if len(SelectedVTL) > 0:
-                h = 0.1
                 meanVTL = np.mean(SelectedVTL)
+                h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
+                h_0 = 0.07
                 self.tractAx.clear()
                 self.tractAx.hold(True)
-                self.tractAx.bar([0], [2 * h], bottom = [meanVTL - h])
-                self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'black')                        
+                self.tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
+                self.tractAx.bar([0], [2 * h_0], bottom = [meanVTL - h_0], color = 'black')
                 self.tractAx.set_ylabel('Vocal Tract Length (cm)')
-                self.tractAx.set_ylim((0, 25))
+                self.tractAx.set_ylim((10, 20))
                 self.tractAx.set_xlim((0, 0.8))
                 self.ui.VocalTractPlot.draw()
             else:
@@ -918,18 +1005,19 @@ class Main(QtGui.QMainWindow):
             if len(SelectedPitch) > 1:
                 RPitch = 39.86 * np.log10(SelectedPitch / meanPitch)
                 STVarPitch = np.std(RPitch)
-                h = 0.1
+                h = self.ui.VarTarget.value() * 0.01 * 0.5 *self.ui.VarRange.value()
+                h_0 = 0.2
                 self.VarAx.clear()
                 self.VarAx.hold(True)
-                self.VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
-                self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                self.VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
+                self.VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
+                self.VarAx.set_ylabel('F0 Variability (Semitones)')
                 self.VarAx.set_ylim((0, 25))
                 self.VarAx.set_xlim((0.0, 0.8))
                 self.ui.PitchVar.draw()
             else:
                 self.VarAx.clear()
-                self.VarAx.set_ylabel('Pitch Variability (Semitones)')
+                self.VarAx.set_ylabel('F0 Variability (Semitones)')
                 self.VarAx.set_ylim((0, 25))
                 self.VarAx.set_xlim((0.0, 0.8))
                 self.ui.PitchVar.draw()

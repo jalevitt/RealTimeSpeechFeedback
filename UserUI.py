@@ -1,24 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 09 10:36:31 2020
 
-@author: jalevitt
-"""
-
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'R:\SteppLab\Members\Josh_Levitt\TestUI.ui'
+# Form implementation generated from reading ui file 'Documents\RealTimeSpeechFeedback-working\UserUI.ui'
 #
-# Created: Mon Mar 09 10:34:14 2020
+# Created: Mon Apr 20 10:19:06 2020
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
-from matplotlibwidget import MatplotlibWidget
-
-
-
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -36,77 +25,99 @@ except AttributeError:
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        # set up the appearance of our ui, button names, locations etc
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(995, 589)
+        MainWindow.resize(975, 528)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
+        self.gridLayout_4 = QtGui.QGridLayout(self.centralwidget)
+        self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
+        self.gridLayout = QtGui.QGridLayout()
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.gridLayout_4.addLayout(self.gridLayout, 0, 0, 8, 21)
         self.TwoD = MatplotlibWidget(self.centralwidget)
-        self.TwoD.setGeometry(QtCore.QRect(10, 10, 521, 421))
         self.TwoD.setObjectName(_fromUtf8("TwoD"))
-        self.Go = QtGui.QPushButton(self.centralwidget)
-        self.Go.setGeometry(QtCore.QRect(260, 440, 75, 23))
-        self.Go.setObjectName(_fromUtf8("Go"))
-        self.LoadData = QtGui.QPushButton(self.centralwidget)
-        self.LoadData.setGeometry(QtCore.QRect(10, 440, 111, 23))
-        self.LoadData.setObjectName(_fromUtf8("LoadData"))
-        self.PlayBack = QtGui.QPushButton(self.centralwidget)
-        self.PlayBack.setGeometry(QtCore.QRect(130, 440, 121, 23))
-        self.PlayBack.setObjectName(_fromUtf8("PlayBack"))
-        self.Save = QtGui.QPushButton(self.centralwidget)
-        self.Save.setGeometry(QtCore.QRect(340, 440, 111, 23))
-        self.Save.setObjectName(_fromUtf8("Save"))
+        self.gridLayout_4.addWidget(self.TwoD, 1, 1, 1, 5)
         self.FundamentalFrequenncyPlot = MatplotlibWidget(self.centralwidget)
-        self.FundamentalFrequenncyPlot.setGeometry(QtCore.QRect(540, 10, 141, 421))
         self.FundamentalFrequenncyPlot.setObjectName(_fromUtf8("FundamentalFrequenncyPlot"))
-        self.Stop = QtGui.QPushButton(self.centralwidget)
-        self.Stop.setGeometry(QtCore.QRect(260, 470, 75, 23))
-        self.Stop.setObjectName(_fromUtf8("Stop"))
-        self.SaveFormants = QtGui.QPushButton(self.centralwidget)
-        self.SaveFormants.setGeometry(QtCore.QRect(340, 470, 111, 23))
-        self.SaveFormants.setObjectName(_fromUtf8("SaveFormants"))
-        self.SavePitch = QtGui.QPushButton(self.centralwidget)
-        self.SavePitch.setGeometry(QtCore.QRect(340, 500, 111, 23))
-        self.SavePitch.setObjectName(_fromUtf8("SavePitch"))
+        self.gridLayout_4.addWidget(self.FundamentalFrequenncyPlot, 1, 6, 1, 5)
         self.VocalTractPlot = MatplotlibWidget(self.centralwidget)
-        self.VocalTractPlot.setGeometry(QtCore.QRect(690, 10, 141, 421))
         self.VocalTractPlot.setObjectName(_fromUtf8("VocalTractPlot"))
+        self.gridLayout_4.addWidget(self.VocalTractPlot, 1, 11, 1, 4)
         self.PitchVar = MatplotlibWidget(self.centralwidget)
-        self.PitchVar.setGeometry(QtCore.QRect(839, 10, 141, 421))
         self.PitchVar.setObjectName(_fromUtf8("PitchVar"))
-        self.DevMode = QtGui.QPushButton(self.centralwidget)
-        self.DevMode.setGeometry(QtCore.QRect(10, 500, 111, 23))
-        self.DevMode.setObjectName(_fromUtf8("DevMode"))
+        self.gridLayout_4.addWidget(self.PitchVar, 1, 15, 1, 6)
+        self.label = QtGui.QLabel(self.centralwidget)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.gridLayout_4.addWidget(self.label, 2, 7, 2, 3)
+        self.label_2 = QtGui.QLabel(self.centralwidget)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.gridLayout_4.addWidget(self.label_2, 2, 12, 2, 4)
+        self.label_3 = QtGui.QLabel(self.centralwidget)
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.gridLayout_4.addWidget(self.label_3, 2, 17, 2, 3)
+        self.LoadData = QtGui.QPushButton(self.centralwidget)
+        self.LoadData.setObjectName(_fromUtf8("LoadData"))
+        self.gridLayout_4.addWidget(self.LoadData, 3, 1, 2, 1)
+        self.PlayBack = QtGui.QPushButton(self.centralwidget)
+        self.PlayBack.setObjectName(_fromUtf8("PlayBack"))
+        self.gridLayout_4.addWidget(self.PlayBack, 3, 2, 2, 1)
+        self.Go = QtGui.QPushButton(self.centralwidget)
+        self.Go.setObjectName(_fromUtf8("Go"))
+        self.gridLayout_4.addWidget(self.Go, 3, 3, 2, 1)
+        self.Save = QtGui.QPushButton(self.centralwidget)
+        self.Save.setObjectName(_fromUtf8("Save"))
+        self.gridLayout_4.addWidget(self.Save, 3, 4, 2, 1)
         self.PitchTarget = QtGui.QDoubleSpinBox(self.centralwidget)
-        self.PitchTarget.setGeometry(QtCore.QRect(580, 470, 62, 22))
         self.PitchTarget.setMaximum(500.0)
         self.PitchTarget.setProperty("value", 100.0)
         self.PitchTarget.setObjectName(_fromUtf8("PitchTarget"))
+        self.gridLayout_4.addWidget(self.PitchTarget, 4, 8, 2, 1)
         self.VTLTarget = QtGui.QDoubleSpinBox(self.centralwidget)
-        self.VTLTarget.setGeometry(QtCore.QRect(730, 470, 62, 22))
         self.VTLTarget.setMaximum(25.0)
         self.VTLTarget.setProperty("value", 15.0)
         self.VTLTarget.setObjectName(_fromUtf8("VTLTarget"))
+        self.gridLayout_4.addWidget(self.VTLTarget, 4, 13, 2, 1)
         self.VarTarget = QtGui.QDoubleSpinBox(self.centralwidget)
-        self.VarTarget.setGeometry(QtCore.QRect(880, 470, 62, 22))
         self.VarTarget.setMaximum(100.0)
-        self.VarTarget.setProperty("value", 5.0)
+        self.VarTarget.setProperty("value", 15.0)
         self.VarTarget.setObjectName(_fromUtf8("VarTarget"))
-        self.label = QtGui.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(560, 450, 101, 16))
-        self.label.setObjectName(_fromUtf8("label"))
-        self.label_2 = QtGui.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(720, 440, 121, 31))
-        self.label_2.setObjectName(_fromUtf8("label_2"))
-        self.label_3 = QtGui.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(870, 440, 91, 31))
-        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.gridLayout_4.addWidget(self.VarTarget, 4, 18, 2, 1)
         self.ReportButton = QtGui.QPushButton(self.centralwidget)
-        self.ReportButton.setGeometry(QtCore.QRect(130, 470, 121, 23))
         self.ReportButton.setObjectName(_fromUtf8("ReportButton"))
+        self.gridLayout_4.addWidget(self.ReportButton, 5, 2, 1, 1)
+        self.Stop = QtGui.QPushButton(self.centralwidget)
+        self.Stop.setObjectName(_fromUtf8("Stop"))
+        self.gridLayout_4.addWidget(self.Stop, 5, 3, 2, 1)
+        self.SaveFormants = QtGui.QPushButton(self.centralwidget)
+        self.SaveFormants.setObjectName(_fromUtf8("SaveFormants"))
+        self.gridLayout_4.addWidget(self.SaveFormants, 5, 4, 2, 1)
+        self.label_4 = QtGui.QLabel(self.centralwidget)
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.gridLayout_4.addWidget(self.label_4, 6, 5, 2, 3)
+        self.F0Range = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.F0Range.setMaximum(100.0)
+        self.F0Range.setProperty("value", 10.0)
+        self.F0Range.setObjectName(_fromUtf8("F0Range"))
+        self.gridLayout_4.addWidget(self.F0Range, 6, 8, 2, 1)
+        self.VTLRange = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.VTLRange.setMaximum(100.0)
+        self.VTLRange.setProperty("value", 10.0)
+        self.VTLRange.setObjectName(_fromUtf8("VTLRange"))
+        self.gridLayout_4.addWidget(self.VTLRange, 6, 13, 2, 1)
+        self.VarRange = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.VarRange.setMaximum(100.0)
+        self.VarRange.setProperty("value", 10.0)
+        self.VarRange.setObjectName(_fromUtf8("VarRange"))
+        self.gridLayout_4.addWidget(self.VarRange, 6, 18, 2, 1)
+        self.DevMode = QtGui.QPushButton(self.centralwidget)
+        self.DevMode.setObjectName(_fromUtf8("DevMode"))
+        self.gridLayout_4.addWidget(self.DevMode, 7, 1, 1, 1)
+        self.SavePitch = QtGui.QPushButton(self.centralwidget)
+        self.SavePitch.setObjectName(_fromUtf8("SavePitch"))
+        self.gridLayout_4.addWidget(self.SavePitch, 7, 4, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 995, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 975, 26))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -117,25 +128,28 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        
 
     def retranslateUi(self, MainWindow):
-        self.Go.setText(_translate("MainWindow", "Go", None))
-        self.LoadData.setText(_translate("MainWindow", "Load Existing Data", None))
-        self.PlayBack.setText(_translate("MainWindow", "Playback Recording", None))
-        self.Save.setText(_translate("MainWindow", "Save .wav", None))
-        self.Stop.setText(_translate("MainWindow", "Stop", None))
-        self.SaveFormants.setText(_translate("MainWindow", "Save Formants", None))
-        self.SavePitch.setText(_translate("MainWindow", "Save Pitch", None))
-        self.DevMode.setText(_translate("MainWindow", "Developer Mode", None))
-        self.label.setText(_translate("MainWindow", "Target Pitch (Hz)", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
+        self.label.setText(_translate("MainWindow", "Target Fundemental\n"
+"Frequency (Hz)", None))
         self.label_2.setText(_translate("MainWindow", "Target Vocal \n"
 "Tract Length (cm)", None))
-        self.label_3.setText(_translate("MainWindow", "Target Pitch\n"
+        self.label_3.setText(_translate("MainWindow", "Target F0\n"
 "Variability (st)", None))
+        self.LoadData.setText(_translate("MainWindow", "Load Existing Data", None))
+        self.PlayBack.setText(_translate("MainWindow", "Playback Recording", None))
+        self.Go.setText(_translate("MainWindow", "Go", None))
+        self.Save.setText(_translate("MainWindow", "Save .wav", None))
         self.ReportButton.setText(_translate("MainWindow", "Generate Report", None))
+        self.Stop.setText(_translate("MainWindow", "Stop", None))
+        self.SaveFormants.setText(_translate("MainWindow", "Save Formants", None))
+        self.label_4.setText(_translate("MainWindow", "Range (%)", None))
+        self.DevMode.setText(_translate("MainWindow", "Developer Mode", None))
+        self.SavePitch.setText(_translate("MainWindow", "Save F0", None))
         self.myCallback.setText(_translate("MainWindow", "Test", None))
-        
+
+from matplotlibwidget import MatplotlibWidget
 
 if __name__ == "__main__":
     import sys

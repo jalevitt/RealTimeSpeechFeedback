@@ -3,6 +3,7 @@
 Created on Mon Mar 23 10:41:12 2020
 
 @author: Josh Levitt
+This file defines the beavior of the main user window
 """
 
 import sys
@@ -14,7 +15,7 @@ import numpy as np
 from Tkinter import *
 import Tkinter, Tkconstants, tkFileDialog
 from matplotlibwidget import MatplotlibWidget
-
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import wave
 import time as ti
@@ -26,7 +27,7 @@ import warnings
 import ReportMain
 import Developer
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore") # warnings are for wimps
 
 class Main(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -56,12 +57,12 @@ class Main(QtGui.QMainWindow):
         self.ui.Pitch = np.zeros(100, dtype = np.float32)
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
         self.ui.Time = np.zeros(1000, dtype = np.float32)
-        self.ui.Targets = np.zeros((1000, 3), dtype = np.float32)
+        self.ui.Targets = np.zeros((1000, 6), dtype = np.float32)
         
         # set up axes labels etc        
         ax = self.ui.TwoD.figure.add_subplot(111)
         ax.set_title('Speech Targeting')
-        ax.set_xlabel('Pitch (Hz)')
+        ax.set_xlabel('Fundamental Frequency (Hz)')
         ax.set_ylabel('Vocal Tract Length (cm)')
         f0ax = self.ui.FundamentalFrequenncyPlot.figure.add_subplot(111)
         f0ax.tick_params(
@@ -84,7 +85,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         tractAx.set_ylabel('Vocal Tract Length (cm)')
-        tractAx.set_ylim((0, 25))
+        tractAx.set_ylim((10, 20))
         tractAx.set_xlim((0, 0.8))
         
         VarAx = self.ui.PitchVar.figure.add_subplot(111)
@@ -95,23 +96,26 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        VarAx.set_ylabel('Pitch Variability (Semitones)')
+        VarAx.set_ylabel('F0 Variability (Semitones)')
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
+        # callback for entering developer mode
     def _LaunchDevMode(self):
         Developer.Main(parent = self).show()
         
+        #callback for generating a report window
     def _MakeReport(self):
         print('Generating Report...')
         ReportMain.ReportWindow(self).show()
         
         
-        
+        # callback to stop recording/playback
     def _StopRun(self):
         #stop recording/playback
         self.ui.Status = False
         
+        # callback to save formants to CSV
     def _SaveF(self): 
         # save formants
         root = Tk()
@@ -131,6 +135,7 @@ class Main(QtGui.QMainWindow):
         root.destroy()
         return True
         
+        # callback to save f0 to CSV
     def _SaveP(self):
         #save Pitch
         root = Tk()
@@ -142,7 +147,7 @@ class Main(QtGui.QMainWindow):
         #write to csv    
         with open(path, 'w') as csvfile:
             PitchWriter = csv.writer(csvfile, delimiter = ',', lineterminator ='\n')
-            PitchWriter.writerow(['time(s)', 'Pitch (Hz)'])
+            PitchWriter.writerow(['time(s)', 'F0 (Hz)'])
             for i in range(len(self.ui.PitchTime)):
                 PitchWriter.writerow(np.concatenate((self.ui.PitchTime[i], self.ui.Pitch[i]), axis = None))
         #close stuff      
@@ -168,6 +173,7 @@ class Main(QtGui.QMainWindow):
         self.ui.FormantTime = np.zeros(100, dtype = np.float32)
         self.ui.Pitch = np.zeros(100, dtype = np.float32)
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
+        self.ui.Targets = np.zeros((1000, 6), dtype = np.float32)
         FormantCount = 0
         PitchCount = 0
         
@@ -190,7 +196,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         tractAx.set_ylabel('Vocal Tract Length (cm)')
-        tractAx.set_ylim((0, 25))
+        tractAx.set_ylim((10, 20))
         tractAx.set_xlim((0, 0.8))
         VarAx = self.ui.PitchVar.figure.add_subplot(111)
         VarAx.tick_params(
@@ -200,7 +206,7 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        VarAx.set_ylabel('Pitch Variability (Semitones)')
+        VarAx.set_ylabel('F0 Variability (Semitones)')
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
@@ -239,7 +245,7 @@ class Main(QtGui.QMainWindow):
                 self.ui.Recording[i * chunkSize:(i + 1) * chunkSize] = data
                 
                 # get f0 and update f0 plot                
-                # use yin implementation instead
+                # use yin implementation 
                 # yin's original implementation called for filtering, 
                 # which we have not yet implemented for computational reasons
                 data_hamming = data * np.hamming(chunkSize)
@@ -248,8 +254,9 @@ class Main(QtGui.QMainWindow):
                 f0 = yin.getPitch(cmndf, self.ui.fs/500, self.ui.fs/75, harmo_th = 0.35)
                 
                 if f0: # if f0 is detected, update our graph
+                    f0 = 1.0 * self.ui.fs/f0 # convert from tau to Hz
                     # store ot pitch and time
-                    self.ui.Pitch[PitchCount] = 1.0 * self.ui.fs/f0
+                    self.ui.Pitch[PitchCount] = f0
                     self.ui.PitchTime[PitchCount] = 1.0 * (t - chunkSize / 2) / self.ui.fs
                     PitchCount += 1
                     # add space if needed
@@ -265,11 +272,13 @@ class Main(QtGui.QMainWindow):
                         pitchIDX -= 1
                         
                     meanPitch = np.mean(RecentPitches)
-                    h = 2.0
+                    h = self.ui.PitchTarget.value() * 0.01 * 0.5 *self.ui.F0Range.value()
+                    h_0 = 3
+                    # make f0 bar plot
                     f0ax.clear()
                     f0ax.hold(True)
-                    f0ax.bar([0], [2.0 * h], bottom = [meanPitch - h])
-                    f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'black')
+                    f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'aqua')
+                    f0ax.bar([0], [2.0 * h_0], bottom = [meanPitch - h_0], color = 'black')
                     f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     f0ax.set_ylim((0, 500))
                     f0ax.set_xlim((0, 0.8))
@@ -299,12 +308,13 @@ class Main(QtGui.QMainWindow):
                         STVarPitch = 0
                     
                     # make pitch variability bar graph
-                    h = 0.1
+                    h = self.ui.VarTarget.value() * 0.01 * 0.5 *self.ui.VarRange.value()
+                    h_0 = 0.2
                     VarAx.clear()
                     VarAx.hold(True)
-                    VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
-                    VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                    VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
+                    VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
+                    VarAx.set_ylabel('F0 Variability (Semitones)')
                     VarAx.set_ylim((0, 25))
                     VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
@@ -337,14 +347,15 @@ class Main(QtGui.QMainWindow):
                             tractIDX -= 1
                             
                         meanTractLength = np.median(RecentTractLength)
-                        h = 0.1
+                        h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
+                        h_0 = 0.07
+                        # make VTL bar plot
                         tractAx.clear()
                         tractAx.hold(True)
-                        tractAx.bar([0], [2 * h], bottom = [meanTractLength - h])
-                        tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'black')
-                        
+                        tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
+                        tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        tractAx.set_ylim((0, 25))
+                        tractAx.set_ylim((10, 20))
                         tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                             
@@ -352,31 +363,42 @@ class Main(QtGui.QMainWindow):
                         Formants = np.zeros(3)
                 
                 #choose color based on how close we are to the variablility target
-                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - STVarPitch)/self.ui.VarTarget.value()
-                if DiffVar > 1:
-                    DiffVar = 1
-                C = (DiffVar, 1 - DiffVar, 0)
+                if STVarPitch < self.ui.VarTarget.value() + 0.5 * self.ui.VarRange.value() and STVarPitch > self.ui.VarTarget.value() - 0.5 * self.ui.VarRange.value():
+                    C = 'dodgerblue'
+                else:
+                    C = 'black'
+                
+
                 #make scatter plot
                 ax.clear()
                 ax.hold(True)
+                rect = patches.Rectangle((self.ui.PitchTarget.value() - 0.5 * 0.01 * self.ui.PitchTarget.value() * self.ui.F0Range.value(),
+                                          self.ui.VTLTarget.value() - 0.5 * 0.01 * self.ui.VTLTarget.value()* self.ui.VTLRange.value()),
+                                        0.01 * self.ui.PitchTarget.value() * self.ui.F0Range.value(),
+                                        0.01 * self.ui.VTLTarget.value()* self.ui.VTLRange.value(), 
+                                        linewidth=0.5, edgecolor='none',facecolor='aqua', alpha = 0.5)
+                ax.add_patch(rect)
                 ax.scatter([meanPitch], [meanTractLength], color = C)
-                ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
+                #ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
                 ax.set_title('Speech Targeting')
-                ax.set_xlabel('Pitch (Hz)')
+                ax.set_xlabel('Fundamental Frequency (Hz)')
                 ax.set_ylabel('Vocal Tract Length (cm)')
                 ax.set_xlim((0, 500))
-                ax.set_ylim((9, 25))
+                ax.set_ylim((10, 20))
                 self.ui.TwoD.draw()
                 
                 #keep track of our target values, in case they chane over time
                 if i >= len(self.ui.Time): # add extra space to vectors in case we need it
                     self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
-                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 3), dtype = np.float32)))
+                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 6), dtype = np.float32)))
                     
                 self.ui.Time[i] = 1.0 * t / self.ui.fs
                 self.ui.Targets[i, 0] = self.ui.PitchTarget.value() 
                 self.ui.Targets[i, 1] = self.ui.VTLTarget.value()
-                self.ui.Targets[i, 2] =self.ui.VarTarget.value()
+                self.ui.Targets[i, 2] = self.ui.VarTarget.value()
+                self.ui.Targets[i, 3] = self.ui.PitchTarget.value() * 0.01 * 0.5 * self.ui.F0Range.value()
+                self.ui.Targets[i, 4] = self.ui.VTLTarget.value() * 0.01 * 0.5 * self.ui.VTLRange.value()
+                self.ui.Targets[i, 5] = self.ui.VarTarget.value() * 0.01 * 0.5 * self.ui.VarRange.value()
                 i += 1
                 
                 #check for incoming button clicks i.e. stop button
@@ -458,6 +480,12 @@ class Main(QtGui.QMainWindow):
         return True
         
     def _Playback(self): # similar to Go, but uses data from Load instead of collecting new data
+    
+        # make sure we actually have some data loaded
+        if np.sum(self.ui.Recording) == 0:
+            print('No data loaded, or loaded data is empty. Aborting playback')
+            return False
+            
         self.ui.Status = True        
         chunkSize = 8192
         p = pyaudio.PyAudio()
@@ -469,6 +497,7 @@ class Main(QtGui.QMainWindow):
         self.ui.FormantTime = np.zeros(100, dtype = np.float32)
         self.ui.Pitch = np.zeros(100, dtype = np.float32)
         self.ui.PitchTime = np.zeros(100, dtype = np.float32)
+        self.ui.Targets = np.zeros((1000, 6), dtype = np.float32)
         PitchCount = 0
         FormantCount = 0
         
@@ -492,7 +521,7 @@ class Main(QtGui.QMainWindow):
                         labelbottom = False)
         tractAx.set_position([0.35, 0.05, 0.6, 0.93])
         tractAx.set_ylabel('Vocal Tract Length (cm)')
-        tractAx.set_ylim((0, 25))
+        tractAx.set_ylim((10, 20))
         tractAx.set_xlim((0, 0.8))
         VarAx = self.ui.PitchVar.figure.add_subplot(111)
         VarAx.tick_params(
@@ -502,7 +531,7 @@ class Main(QtGui.QMainWindow):
                         top = False,
                         labelbottom = False)
         VarAx.set_position([0.35, 0.05, 0.6, 0.93])
-        VarAx.set_ylabel('Pitch Variability (Hz)')
+        VarAx.set_ylabel('F0 Variability (Hz)')
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
@@ -537,8 +566,9 @@ class Main(QtGui.QMainWindow):
                 f0 = yin.getPitch(cmndf, self.ui.fs/500, self.ui.fs/75, harmo_th = 0.35)
                 
                 if f0:
+                    f0 = 1.0 * self.ui.fs/f0 # convert from tau to Hz
                     # store ot pitch and time
-                    self.ui.Pitch[PitchCount] = 1.0 * self.ui.fs/f0
+                    self.ui.Pitch[PitchCount] = f0
                     self.ui.PitchTime[PitchCount] = 1.0 * (t - chunkSize / 2) / self.ui.fs
                     PitchCount += 1
                     # add space if needed
@@ -553,11 +583,12 @@ class Main(QtGui.QMainWindow):
                         pitchIDX -= 1
                         
                     meanPitch = np.mean(RecentPitches)
-                    h = 2.0
+                    h = self.ui.PitchTarget.value() * 0.01 * 0.5 *self.ui.F0Range.value()
+                    h_0 = 3
                     f0ax.clear()
                     f0ax.hold(True)
-                    f0ax.bar([0], [2.0 * h], bottom = [meanPitch - h])
-                    f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'black')
+                    f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'aqua')
+                    f0ax.bar([0], [2.0 * h_0], bottom = [meanPitch - h_0], color = 'black')
                     f0ax.set_ylabel('Fundamental Frequency (Hz)')
                     f0ax.set_ylim((0, 500))
                     f0ax.set_xlim((0, 0.8))
@@ -587,12 +618,13 @@ class Main(QtGui.QMainWindow):
                     else:
                         STVarPitch = 0
                         
-                    h = 0.1
+                    h = self.ui.VarTarget.value() * 0.01 * 0.5 *self.ui.VarRange.value()
+                    h_0 = 0.2
                     VarAx.clear()
                     VarAx.hold(True)
-                    VarAx.bar([0], [2.0 * h], bottom = [STVarPitch - h])
-                    VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'black')
-                    VarAx.set_ylabel('Pitch Variability (Semitones)')
+                    VarAx.bar([0], [2.0 * h], bottom = [self.ui.VarTarget.value() - h], color = 'aqua')
+                    VarAx.bar([0], [2.0 * h_0], bottom = [STVarPitch - h_0], color = 'black')   
+                    VarAx.set_ylabel('F0 Variability (Semitones)')
                     VarAx.set_ylim((0, 25))
                     VarAx.set_xlim((0.0, 0.8))
                     self.ui.PitchVar.draw()
@@ -624,44 +656,59 @@ class Main(QtGui.QMainWindow):
                             tractIDX -= 1
                             
                         meanTractLength = np.median(RecentTractLength)
-                        h = 0.1
+                        h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
+                        h_0 = 0.07
                         tractAx.clear()
                         tractAx.hold(True)
-                        tractAx.bar([0], [2 * h], bottom = [meanTractLength - h])
-                        tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'black')
-                        
+                        tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')
+                        tractAx.bar([0], [2 * h_0], bottom = [meanTractLength - h_0], color = 'black')
                         tractAx.set_ylabel('Vocal Tract Length (cm)')
-                        tractAx.set_ylim((0, 25))
+                        tractAx.set_ylim((10, 20))
                         tractAx.set_xlim((0, 0.8))
                         self.ui.VocalTractPlot.draw()
                             
                     except (RuntimeError):
                         Formants = np.zeros(3)
-                        
-                DiffVar = 2 * np.abs(self.ui.VarTarget.value() - STVarPitch)/self.ui.VarTarget.value()
-                if DiffVar > 1:
-                    DiffVar = 1
-                    
-                C = (DiffVar, 1 - DiffVar, 0)
+                
+                #choose color based on how close we are to the variablility target
+                varmin = self.ui.VarTarget.value() - 0.5 * 0.01 * self.ui.VarTarget.value() * self.ui.VarRange.value()
+                varmax = self.ui.VarTarget.value() + 0.5 * 0.01 * self.ui.VarTarget.value() * self.ui.VarRange.value()   
+                if STVarPitch < varmax and STVarPitch > varmin:
+                    C = 'dodgerblue'
+                else:
+                    C = 'black'
+                
+
+                #make scatter plot
                 ax.clear()
                 ax.hold(True)
                 ax.scatter([meanPitch], [meanTractLength], color = C)
-                ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
+                rect = patches.Rectangle((self.ui.PitchTarget.value() - 0.5 * 0.01 * self.ui.PitchTarget.value() * self.ui.F0Range.value(),
+                                          self.ui.VTLTarget.value() - 0.5 * 0.01 * self.ui.VTLTarget.value()* self.ui.VTLRange.value()),
+                                        0.01 * self.ui.PitchTarget.value() * self.ui.F0Range.value(),
+                                        0.01 * self.ui.VTLTarget.value()* self.ui.VTLRange.value(), 
+                                        linewidth=0.5, edgecolor='none',facecolor='aqua', alpha = 0.5)
+                ax.add_patch(rect)
+                
+                #ax.scatter([self.ui.PitchTarget.value()], [self.ui.VTLTarget.value()], color = 'black')
                 ax.set_title('Speech Targeting')
-                ax.set_xlabel('Pitch (Hz)')
+                ax.set_xlabel('Fundamental Frequency (Hz)')
                 ax.set_ylabel('Vocal Tract Length (cm)')
                 ax.set_xlim((0, 500))
-                ax.set_ylim((9, 25))
+                ax.set_ylim((10, 20))
                 self.ui.TwoD.draw()
                 
                 if Count >= len(self.ui.Time):
                     self.ui.Time = np.concatenate((self.ui.Time,  np.zeros(1000, dtype = np.float32)))
-                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 3), dtype = np.float32)))
+                    self.ui.Targets = np.concatenate((self.ui.Targets, np.zeros((1000, 6), dtype = np.float32)))
                     
                 self.ui.Time[Count] = 1.0 * t / self.ui.fs
                 self.ui.Targets[Count, 0] = self.ui.PitchTarget.value() 
                 self.ui.Targets[Count, 1] = self.ui.VTLTarget.value()
                 self.ui.Targets[Count, 2] =self.ui.VarTarget.value()
+                self.ui.Targets[Count, 3] = self.ui.PitchTarget.value() * 0.01 * 0.5 * self.ui.F0Range.value()
+                self.ui.Targets[Count, 4] = self.ui.VTLTarget.value() * 0.01 * 0.5 * self.ui.VTLRange.value()
+                self.ui.Targets[Count, 5] = self.ui.VarTarget.value() * 0.01 * 0.5 * self.ui.VarRange.value()
                 
                 Count += 1    
                     

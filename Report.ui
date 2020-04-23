@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>830</width>
-    <height>784</height>
+    <width>723</width>
+    <height>736</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,47 +18,17 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
-      <width>531</width>
-      <height>161</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="PitchPlot">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>230</y>
-      <width>531</width>
-      <height>161</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="VTLPlot">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>400</y>
-      <width>531</width>
-      <height>161</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="MatplotlibWidget" name="VarPlot">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>570</y>
-      <width>531</width>
-      <height>161</height>
+      <y>30</y>
+      <width>420</width>
+      <height>151</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="PlayBack">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>60</y>
+      <x>440</x>
+      <y>30</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -67,13 +37,26 @@
      <string>Play Selection</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>70</y>
+      <width>112</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Recording Statistics</string>
+    </property>
+   </widget>
    <widget class="QTextBrowser" name="RecordingText">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>130</y>
+      <x>440</x>
+      <y>90</y>
       <width>256</width>
-      <height>231</height>
+      <height>192</height>
      </rect>
     </property>
     <property name="html">
@@ -84,22 +67,32 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="SelectionText">
+   <widget class="MatplotlibWidget" name="PitchPlot">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>410</y>
-      <width>256</width>
-      <height>231</height>
+      <x>10</x>
+      <y>190</y>
+      <width>420</width>
+      <height>151</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="MatplotlibWidget" name="VTLPlot">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>350</y>
+      <width>420</width>
+      <height>151</height>
      </rect>
     </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>390</y>
-      <width>131</width>
+      <x>440</x>
+      <y>290</y>
+      <width>107</width>
       <height>16</height>
      </rect>
     </property>
@@ -107,26 +100,43 @@ p, li { white-space: pre-wrap; }
      <string>Selection Statistics</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QTextBrowser" name="SelectionText">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>110</y>
-      <width>141</width>
-      <height>16</height>
+      <x>440</x>
+      <y>310</y>
+      <width>256</width>
+      <height>192</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Recording Statistics</string>
+   </widget>
+   <widget class="MatplotlibWidget" name="VarPlot">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>510</y>
+      <width>420</width>
+      <height>151</height>
+     </rect>
     </property>
    </widget>
+   <zorder>RawPlot</zorder>
+   <zorder>PlayBack</zorder>
+   <zorder>label_2</zorder>
+   <zorder>RecordingText</zorder>
+   <zorder>PitchPlot</zorder>
+   <zorder>VTLPlot</zorder>
+   <zorder>label</zorder>
+   <zorder>SelectionText</zorder>
+   <zorder>VarPlot</zorder>
+   <zorder>verticalSpacer</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>830</width>
+     <width>723</width>
      <height>26</height>
     </rect>
    </property>
