@@ -3,6 +3,7 @@
 Created on Mon Mar 23 10:41:12 2020
 
 @author: Josh Levitt
+This file defines the beavior of the main user window
 """
 
 import sys
@@ -99,19 +100,22 @@ class Main(QtGui.QMainWindow):
         VarAx.set_ylim((0, 25))
         VarAx.set_xlim((0, 0.8))
         
+        # callback for entering developer mode
     def _LaunchDevMode(self):
         Developer.Main(parent = self).show()
         
+        #callback for generating a report window
     def _MakeReport(self):
         print('Generating Report...')
         ReportMain.ReportWindow(self).show()
         
         
-        
+        # callback to stop recording/playback
     def _StopRun(self):
         #stop recording/playback
         self.ui.Status = False
         
+        # callback to save formants to CSV
     def _SaveF(self): 
         # save formants
         root = Tk()
@@ -131,6 +135,7 @@ class Main(QtGui.QMainWindow):
         root.destroy()
         return True
         
+        # callback to save f0 to CSV
     def _SaveP(self):
         #save Pitch
         root = Tk()
@@ -269,6 +274,7 @@ class Main(QtGui.QMainWindow):
                     meanPitch = np.mean(RecentPitches)
                     h = self.ui.PitchTarget.value() * 0.01 * 0.5 *self.ui.F0Range.value()
                     h_0 = 3
+                    # make f0 bar plot
                     f0ax.clear()
                     f0ax.hold(True)
                     f0ax.bar([0], [2.0 * h], bottom = [self.ui.PitchTarget.value() - h], color = 'aqua')
@@ -343,6 +349,7 @@ class Main(QtGui.QMainWindow):
                         meanTractLength = np.median(RecentTractLength)
                         h = self.ui.VTLTarget.value() * 0.01 * 0.5 *self.ui.VTLRange.value()
                         h_0 = 0.07
+                        # make VTL bar plot
                         tractAx.clear()
                         tractAx.hold(True)
                         tractAx.bar([0], [2 * h], bottom = [self.ui.VTLTarget.value() - h], color = 'aqua')

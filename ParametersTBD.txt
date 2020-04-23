@@ -15,7 +15,8 @@ method: this is an optional parameter for the function yin.getPitch(). the curre
 		Developer.py, and ReportMain.py
 
 tau_min, tau_max: These are the max and min values, acting as bounds for pitch (tau) detection. their current values
-		depend upon fs, and area set to fs/500 and fs/75 respectively
+		depend upon fs, and area set to fs/500 and fs/75 respectively. This effectively limits f0 detection to 
+		75Hz < f0 < 500Hz
 		These variables are used in UserMain.py, Developer.py, and ReportMain.py, but are not stored in a variable.
 		Instead, they are entered directly in the function call yin.getPitch() and yin.differenceFunction().
 
@@ -43,7 +44,7 @@ LPC Parameters: there are a number of choices I made in the function FormantFind
 				This comes directly from the source of the code, but is arguably on the high side.
 		
 		Restrictions: I set restrictions that formants had to be greater than 90Hz, and less than 5000Hz, 
-				with a bandwidth les than 500Hz. Again, these values are direct from the code source,
+				with a bandwidth less than 500Hz. Again, these values are direct from the code source,
 				but they seem reasonable to me.
 
 		Also note that a maximum of 5 formants can actually be stored, although more can be detected in principle.
