@@ -3,6 +3,8 @@
 Created on Tue Mar 10 13:05:03 2020
 
 @author: jalevitt
+
+This file contains functions for calculating VTL and for finding formants
 """
 
 from scipy.stats import norm
@@ -33,7 +35,6 @@ def findGaussianFormantPeaks(FreqBins, PSD):
 # which is in turn based on MatLab code found at https://www.mathworks.com/help/signal/ug/formant-estimation-with-lpc-coefficients.html
 # which cites [1]Snell, Roy C., and Fausto Milinazzo. "Formant location from LPC analysis data." IEEE® Transactions on Speech and Audio Processing. Vol. 1, Number 2, 1993, pp. 129-134.
 # and [2] Loizou, Philipos C. "COLEA: A MATLAB Software Tool for Speech Analysis."
-# I have to admit I don't fully understand it, but apparently it works?
 def findFormantsLPC(Frame, fs):
     N = len(Frame)
     
@@ -46,7 +47,7 @@ def findFormantsLPC(Frame, fs):
     order = 2 + fs / 1000
     A, e, k = scikits.talkbox.lpc(FrameFiltered, order)
     
-    # Get the roots?
+    # Get the roots
     rts = np.roots(A)
     rts = [r for r in rts if np.imag(r) >= 0] #select the roots with an imaginary component >=0
     
@@ -72,7 +73,7 @@ def findFormantsLPC(Frame, fs):
         
     return Formants
 
-# find vocal tract length from formants, based on some parameters from the lammert paper
+# find vocal tract length from formants, based on some parameters from the Lammert paper
 def getVocalTractLength(Formants, c = 34300, method = 'fd'):
     F = Formants
     lastNonZero = 0
